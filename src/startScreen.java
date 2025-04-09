@@ -47,13 +47,13 @@ public class startScreen {
                 return;
             }
 
-            boolean isValid = Connection.checkZdravnikSifra(sifra);
-            if (isValid) {
-                JOptionPane.showMessageDialog(frame, "Zdravnik login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                frame.dispose();  // Close login window
-                new ZdravnikMain(sifra);  // Open new window
+            String ime = Connection.checkZdravnikSifra(sifra);
+            if (ime != null) {
+                JOptionPane.showMessageDialog(frame, "Welcome, Dr. " + ime + "!", "Login Successful", JOptionPane.INFORMATION_MESSAGE);
+                frame.dispose();
+                new ZdravnikMain(ime);
             } else {
-                JOptionPane.showMessageDialog(frame, "Invalid zdravnik šifra.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Invalid šifra.", "Login Failed", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -66,11 +66,15 @@ public class startScreen {
                 return;
             }
 
-            boolean isValid = Connection.checkTajnistvoCredentials(email, password);
-            if (isValid) {
-                JOptionPane.showMessageDialog(frame, "Tajnistvo login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                frame.dispose();  // Close login window
-                new TajnistvoMain(email);  // Open new window
+            Object[] credentials = Connection.checkTajnistvoCredentials(email, password);
+            if (credentials != null) {
+                int id = (int) credentials[0];
+                String ime = (String) credentials[1];
+                String glavniTajnikCa = (String) credentials[2];
+
+                JOptionPane.showMessageDialog(frame, "Welcome, " + ime + "!", "Login Successful", JOptionPane.INFORMATION_MESSAGE);
+                frame.dispose();
+                new TajnistvoMain(id, ime, glavniTajnikCa);
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
             }

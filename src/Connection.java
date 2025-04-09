@@ -19,9 +19,9 @@ public class Connection {
         return connection;
     }
 
-    public static boolean checkZdravnikSifra(String sifra) {
-        boolean result = false;
-        String query = "SELECT checkZdravnikSifra(?)";
+    public static String checkZdravnikSifra(String sifra) {
+        String result = null;
+        String query = "SELECT * FROM checkZdravnikSifra(?)";
 
         try (java.sql.Connection conn = connectToDatabase();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -30,7 +30,10 @@ public class Connection {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    result = rs.getBoolean(1);
+                    String ime = rs.getString("iime");
+                    if (!"FALSE".equals(ime)) {
+                        result = ime;
+                    }
                 }
             }
 
@@ -41,9 +44,9 @@ public class Connection {
         return result;
     }
 
-    public static boolean checkTajnistvoCredentials(String email, String password) {
-        boolean result = false;
-        String query = "SELECT checkTajnistvoCredentials(?, ?)";
+    public static Object[] checkTajnistvoCredentials(String email, String password) {
+        Object[] result = null;
+        String query = "SELECT * FROM checkTajnistvoCredentials(?, ?)";
 
         try (java.sql.Connection conn = connectToDatabase();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -53,7 +56,13 @@ public class Connection {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    result = rs.getBoolean(1);
+                    int id = rs.getInt("iid");
+                    String ime = rs.getString("iime");
+                    String glavniTajnikCa = rs.getString("gglavnia_tajnikca");
+
+                    if (id != -1) {
+                        result = new Object[]{id, ime, glavniTajnikCa};
+                    }
                 }
             }
 
