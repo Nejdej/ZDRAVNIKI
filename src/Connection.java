@@ -1,6 +1,8 @@
 package src;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Connection {
 
@@ -71,5 +73,69 @@ public class Connection {
         }
 
         return result;
+    }
+
+    public static Object[][] getOddelkiForTajnistvo(int tajnistvoId) {
+        String query = "SELECT * FROM prikaziOddelkeVTajnistvu(?)";
+        Object[][] data = new Object[0][];
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(
+                     query,
+                     ResultSet.TYPE_SCROLL_INSENSITIVE,
+                     ResultSet.CONCUR_READ_ONLY)) {
+
+            stmt.setInt(1, tajnistvoId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.last();
+                int rowCount = rs.getRow();
+                rs.beforeFirst();
+
+                data = new Object[rowCount][4];
+                int i = 0;
+                while (rs.next()) {
+                    data[i][0] = rs.getInt("iid");
+                    data[i][1] = rs.getString("iime");
+                    data[i][2] = rs.getString("oopis");
+                    data[i][3] = rs.getString("ttajnistvo");
+                    i++;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving oddelki: " + e.getMessage());
+        }
+        return data;
+    }
+
+    public static List<Object[]> getDelavciForOddelek(int oid) {
+        List<Object[]> workers = new ArrayList<>();
+        String query = "SELECT * FROM prikaziDelavceVoddelku(?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, oid);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] worker = new Object[]{
+                            rs.getInt("iid"),
+                            rs.getString("iime"),
+                            rs.getString("ppriimek"),
+                            rs.getString("eemso"),
+                            rs.getString("ttelefon"),
+                            rs.getString("sslikica"), // you can convert this to ImageIcon later
+                            rs.getString("ooddelek"),
+                            rs.getString("ttajnistvo"),
+                            rs.getString("kkraj")
+                    };
+                    workers.add(worker);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error retrieving delavci: " + e.getMessage());
+        }
+
+        return workers;
     }
 }
