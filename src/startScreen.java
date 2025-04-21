@@ -51,7 +51,7 @@ public class startScreen {
             if (ime != null) {
                 JOptionPane.showMessageDialog(frame, "Welcome, Dr. " + ime + "!", "Login Successful", JOptionPane.INFORMATION_MESSAGE);
                 frame.dispose();
-                new ZdravnikMain(ime);
+                new ZdravnikMain(ime, sifra);
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid šifra.", "Login Failed", JOptionPane.ERROR_MESSAGE);
             }

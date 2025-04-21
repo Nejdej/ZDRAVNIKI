@@ -138,4 +138,65 @@ public class Connection {
 
         return workers;
     }
+
+    public static List<Object[]> getTajnistva() {
+        List<Object[]> tajnistva = new ArrayList<>();
+        String query = "SELECT * FROM prikaziTajnistva()";
+
+        try (java.sql.Connection conn = connectToDatabase();
+        PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Object[] row = new Object[7];
+                row[0] = rs.getInt("iid");
+                row[1] = rs.getString("iime");
+                row[2] = rs.getString("eemail");
+                row[3] = rs.getString("ttelefon");
+                row[4] = rs.getString("gglavnia_tajnikca");
+                row[5] = rs.getString("nnaslov");
+                row[6] = rs.getString("kkraj");
+                tajnistva.add(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tajnistva;
+    }
+
+    public static void updateZdravnik(String csifra, String nsifra, String cnaziv, String nnaziv) {
+        String query = "SELECT updajtajZdravnika(?, ?, ?, ?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, csifra);
+            stmt.setString(2, nsifra);
+            stmt.setString(3, cnaziv);
+            stmt.setString(4, nnaziv);
+
+            stmt.execute();
+            System.out.println("Zdravnik successfully updated.");
+
+        } catch (SQLException e) {
+            System.out.println("Error updating zdravnik: " + e.getMessage());
+        }
+    }
+
+    public static void deleteZdravnik(String csifra) {
+        String query = "SELECT deletajZdravnika(?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, csifra);
+            stmt.execute();
+            System.out.println("Zdravnik successfully deleted.");
+
+        } catch (SQLException e) {
+            System.out.println("Error deleting zdravnik: " + e.getMessage());
+        }
+    }
+
+
 }
