@@ -197,6 +197,98 @@ public class Connection {
             System.out.println("Error deleting zdravnik: " + e.getMessage());
         }
     }
+    public static Object[] getTajnistvoById(int tid) {
+        Object[] tajnistvo = null;
+        String query = "SELECT * FROM prikaziTajnistvo(?)";
 
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
 
+            stmt.setInt(1, tid);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                tajnistvo = new Object[8];
+                tajnistvo[0] = rs.getInt("iid");
+                tajnistvo[1] = rs.getString("iime");
+                tajnistvo[2] = rs.getString("eemail");
+                tajnistvo[3] = rs.getString("ttelefon");
+                tajnistvo[4] = rs.getString("gglavnia_tajnikca");
+                tajnistvo[5] = rs.getString("nnaslov");
+                tajnistvo[6] = rs.getString("kkraj");
+                tajnistvo[7] = rs.getString("ppass");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error retrieving tajnistvo by ID: " + e.getMessage());
+        }
+
+        return tajnistvo;
+    }
+    public static void updateTajnistvo(int tid, String ime, String email, String telefon, String glavniTajnik, String naslov, String posta) {
+        String query = "SELECT updajtajTajnistvo(?, ?, ?, ?, ?, ?, ?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, tid);
+            stmt.setString(2, ime);
+            stmt.setString(3, email);
+            stmt.setString(4, telefon);
+            stmt.setString(5, glavniTajnik);
+            stmt.setString(6, naslov);
+            stmt.setString(7, posta);
+
+            stmt.execute();
+            System.out.println("Tajnistvo updated successfully.");
+
+        } catch (SQLException e) {
+            System.out.println("Error updating tajnistvo: " + e.getMessage());
+        }
+
+    }
+
+    public static List<Object[]> getAllKraji() {
+        List<Object[]> kraji = new ArrayList<>();
+        String query = "SELECT * FROM prikaziKraje()";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Object[] row = new Object[3];
+                row[0] = rs.getInt("iid");     // ID
+                row[1] = rs.getString("iime"); // Name
+                row[2] = rs.getString("pposta"); // Posta
+                kraji.add(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return kraji;
+    }
+
+    public static Object[] getKrajByPosta(String posta) {
+        Object[] kraj = null;
+        String query = "SELECT * FROM prikaziKraj(?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, posta);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                kraj = new Object[]{
+                        rs.getInt("iid"),
+                        rs.getString("iime"),
+                        rs.getString("pposta")
+                };
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return kraj;
+    }
 }

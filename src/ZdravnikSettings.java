@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class ZdravnikSettings extends JFrame {
 
-    public ZdravnikSettings(String currentNaziv, String currentSifra) {
+    public ZdravnikSettings(String currentNaziv, String currentSifra, ZdravnikUpdateListener listener) {
         setTitle("Zdravnik Nastavitve");
         setSize(300, 250);
         setLocationRelativeTo(null);
@@ -32,6 +32,12 @@ public class ZdravnikSettings extends JFrame {
 
             Connection.updateZdravnik(currentSifra, newSifra, currentNaziv, newNaziv);
             JOptionPane.showMessageDialog(this, "Zdravnik uspešno posodobljen.");
+            dispose();
+
+            // Notify Main Window
+            if (listener != null) {
+                listener.onZdravnikUpdated(newNaziv, newSifra);
+            }
         });
 
         JButton deleteButton = new JButton("DELETE");
@@ -41,6 +47,7 @@ public class ZdravnikSettings extends JFrame {
                 Connection.deleteZdravnik(currentSifra);
                 JOptionPane.showMessageDialog(this, "Zdravnik izbrisan.");
                 dispose();
+                System.exit(0); // or go back to login screen if you have one
             }
         });
 

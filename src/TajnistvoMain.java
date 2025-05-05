@@ -6,19 +6,25 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class TajnistvoMain extends JFrame {
+public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
+
+    private int id;
+    private JLabel label1;
+    private JLabel label3;
 
     public TajnistvoMain(int id, String ime, String glavniTajnikCa) {
+        this.id = id;
+
         setTitle("Tajništvo Portal");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 400); // increased for table visibility
+        setSize(600, 400);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        JLabel label1 = new JLabel("Pozdravljeni, " + ime + "!", SwingConstants.CENTER);
-        JLabel label3 = new JLabel("Glavni tajnik/ca: " + glavniTajnikCa, SwingConstants.CENTER);
+        label1 = new JLabel("Pozdravljeni, " + ime + "!", SwingConstants.CENTER);
+        label3 = new JLabel("Glavni tajnik/ca: " + glavniTajnikCa, SwingConstants.CENTER);
         label1.setAlignmentX(Component.CENTER_ALIGNMENT);
         label3.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -27,7 +33,7 @@ public class TajnistvoMain extends JFrame {
         panel.add(label3);
         panel.add(Box.createVerticalStrut(10));
 
-        /// Table for oddelki (non-editable)
+        // Table setup
         String[] columnNames = {"ID", "Ime oddelka", "Opis", "Tajništvo"};
         Object[][] data = Connection.getOddelkiForTajnistvo(id);
 
@@ -40,7 +46,7 @@ public class TajnistvoMain extends JFrame {
 
         JTable table = new JTable(model);
 
-// Hide ID column
+        // Hide ID and Tajnistvo columns
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setMaxWidth(0);
         table.getColumnModel().getColumn(0).setWidth(0);
@@ -51,25 +57,45 @@ public class TajnistvoMain extends JFrame {
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setPreferredSize(new Dimension(500, 200));
-
         panel.add(scrollPane);
         panel.add(Box.createVerticalGlue());
 
         add(panel);
         setVisible(true);
 
+        // Double-click logic
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { // double click
+                if (e.getClickCount() == 2) {
                     int row = table.getSelectedRow();
                     if (row != -1) {
-                        int oddelekId = (int) table.getValueAt(row, 0); // hidden ID
+                        int oddelekId = (int) table.getValueAt(row, 0);
                         new DelavciMain(oddelekId);
                     }
                 }
             }
         });
 
+        // Settings Button
+        JButton settingsButton = new JButton("⚙ Nastavitve");
+        settingsButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        settingsButton.addActionListener(e -> new TajnistvoSettings(id, TajnistvoMain.this));
+
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BorderLayout());
+        topPanel.add(settingsButton, BorderLayout.EAST);
+        getContentPane().add(topPanel, BorderLayout.NORTH);
+    }
+
+    @Override
+    public void onTajnistvoUpdated() {
+        Object[] data = Connection.getTajnistvoById(id);
+        if (data != null) {
+            String ime = (String) data[1];
+            String glavniTajnikCa = (String) data[4];
+
+            label1.setText("Pozdravljeni, " + ime + "!");
+            label3.setText("Glavni tajnik/ca: " + glavniTajnikCa);
+        }
     }
 }
-

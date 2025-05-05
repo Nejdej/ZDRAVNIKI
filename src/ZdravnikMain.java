@@ -30,7 +30,13 @@ public class ZdravnikMain extends JFrame {
         topPanel.add(label, BorderLayout.CENTER);
 
         JButton settingsButton = new JButton("Settings");
-        settingsButton.addActionListener(e -> new ZdravnikSettings(ime, sifra).setVisible(true));
+        settingsButton.addActionListener(e -> {
+            ZdravnikSettings settings = new ZdravnikSettings(ime, sifra, (newIme, newSifra) -> {
+                dispose(); // close current window
+                new ZdravnikMain(newIme, newSifra); // reopen with new data
+            });
+            settings.setVisible(true);
+        });
         topPanel.add(settingsButton, BorderLayout.EAST);
 
         rightPanel.add(topPanel, BorderLayout.NORTH);
