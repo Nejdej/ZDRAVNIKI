@@ -1,0 +1,101 @@
+package src;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Base64;
+import java.util.List;
+
+public class DelavecSettingsWindow extends JFrame {
+
+    public DelavecSettingsWindow(Object[] delavecData, int tajnistvoId, int oddelekId) {
+        setTitle("Nastavitve Delavca");
+        setSize(400, 600);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+        // Extract delavec data
+        String ime = (String) delavecData[1];
+        String priimek = (String) delavecData[2];
+        String currentEmso = (String) delavecData[3];
+        String telefon = (String) delavecData[4];
+        String slikaBase64 = (String) delavecData[5];
+
+
+        // Image preview
+        JLabel imageLabel = new JLabel();
+        if (slikaBase64 != null && !slikaBase64.isEmpty()) {
+            try {
+                byte[] imageBytes = Base64.getDecoder().decode(slikaBase64);
+                ImageIcon icon = new ImageIcon(imageBytes);
+                Image scaled = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                imageLabel.setIcon(new ImageIcon(scaled));
+            } catch (Exception e) {
+                imageLabel.setText("Slika ni na voljo");
+            }
+        } else {
+            imageLabel.setText("Slika ni na voljo");
+        }
+
+        // Input fields
+        JTextField imeField = new JTextField(ime);
+        JTextField priimekField = new JTextField(priimek);
+        JTextField emsoField = new JTextField(currentEmso); // can allow editing
+        JTextField telefonField = new JTextField(telefon);
+
+        // Dropdown for oddelki
+        JComboBox<String> oddelekDropdown = new JComboBox<>();
+        List<Object[]> oddelki = Connection.prikaziOddelkeVTajnistvu(tajnistvoId);
+        String selectedOddelekIme = null;
+
+        for (Object[] oddelek : oddelki) {
+            String imeOddelka = (String) oddelek[1];
+            oddelekDropdown.addItem(imeOddelka);
+            int id = (int) oddelek[0];
+            if (id == oddelekId) selectedOddelekIme = imeOddelka;
+        }
+        if (selectedOddelekIme != null) {
+            oddelekDropdown.setSelectedItem(selectedOddelekIme);
+        }
+
+        // Layout
+        mainPanel.add(new JLabel("Ime:"));
+        mainPanel.add(imeField);
+        mainPanel.add(new JLabel("Priimek:"));
+        mainPanel.add(priimekField);
+        mainPanel.add(new JLabel("EMŠO:"));
+        mainPanel.add(emsoField);
+        mainPanel.add(new JLabel("Telefon:"));
+        mainPanel.add(telefonField);
+        mainPanel.add(new JLabel("Oddelek:"));
+        mainPanel.add(oddelekDropdown);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(imageLabel);
+
+        // Update button
+        JButton updateButton = new JButton("Posodobi");
+        updateButton.addActionListener(e -> {
+            String newIme = imeField.getText();
+            String newPriimek = priimekField.getText();
+            String newEmso = emsoField.getText();
+            String newTelefon = telefonField.getText();
+            String oddelekIme = (String) oddelekDropdown.getSelectedItem();
+
+            Connection.updajtajDelavca(
+                    currentEmso, newEmso, newIme, newPriimek, newTelefon, slikaBase64, oddelekIme
+            );
+
+            JOptionPane.showMessageDialog(this, "Delavec uspešno posodobljen!");
+            dispose();
+        });
+
+        mainPanel.add(Box.createVerticalStrut(15));
+        mainPanel.add(updateButton);
+
+        add(mainPanel, BorderLayout.CENTER);
+        setVisible(true);
+    }
+}

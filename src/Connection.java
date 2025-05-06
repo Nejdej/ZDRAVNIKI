@@ -1,5 +1,6 @@
 package src;
 
+import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -291,4 +292,112 @@ public class Connection {
 
         return kraj;
     }
+
+    public static void insertajPregled(String leto, Timestamp datum, String opombe, String emso) {
+        String query = "SELECT insertajPregled(?, ?, ?, ?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, leto);
+            stmt.setTimestamp(2, datum);
+            stmt.setString(3, opombe);
+            stmt.setString(4, emso);
+
+            stmt.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Object[]> getPreglediForDelavec(String emso) {
+        List<Object[]> pregledi = new ArrayList<>();
+        String query = "SELECT * FROM prikaziPregledDelavca(?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, emso);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Object[] row = new Object[4];
+                row[0] = rs.getString("iid");
+                row[1] = rs.getTimestamp("ddatum");
+                row[2] = rs.getString("oopombe");
+                row[3] = rs.getString("eemso");
+                pregledi.add(row);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return pregledi;
+    }
+
+    public static void deletajDelavca(String emso) {
+        String query = "SELECT deletajDelavca(?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, emso);
+            stmt.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Napaka pri brisanju delavca!", "Napaka", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public static void updajtajDelavca(String currentEmso, String newEmso, String ime, String priimek,
+                                       String telefon, String slikica, String oddelekIme) {
+
+        String query = "SELECT updajtajDelavca(?, ?, ?, ?, ?, ?, ?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, currentEmso);
+            stmt.setString(2, newEmso);
+            stmt.setString(3, ime);
+            stmt.setString(4, priimek);
+            stmt.setString(5, telefon);
+            stmt.setString(6, slikica);
+            stmt.setString(7, oddelekIme);
+            stmt.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Napaka pri posodabljanju delavca!", "Napaka", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    public static List<Object[]> prikaziOddelkeVTajnistvu(int tajnistvoId) {
+        List<Object[]> oddelki = new ArrayList<>();
+        String query = "SELECT * FROM prikaziOddelkeVTajnistvu(?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, tajnistvoId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Object[] row = new Object[4];
+                row[0] = rs.getInt("iid");
+                row[1] = rs.getString("iime");
+                row[2] = rs.getString("oopis");
+                row[3] = rs.getString("ttajnistvo");
+                oddelki.add(row);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Napaka pri pridobivanju oddelkov!", "Napaka", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return oddelki;
+    }
+
 }

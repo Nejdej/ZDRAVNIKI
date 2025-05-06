@@ -7,7 +7,7 @@ import java.util.List;
 
 public class DelavciMain extends JFrame {
 
-    public DelavciMain(int oddelekId) {
+    public DelavciMain(int oddelekId, int tajnistvoId) {
         setTitle("Delavci v Oddelku");
         setSize(800, 600);
         setLocationRelativeTo(null);
@@ -49,6 +49,52 @@ public class DelavciMain extends JFrame {
             }
             imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+            String emso = (String) d[3]; // assuming emso is at index 3
+            JButton narociButton = new JButton("Naroči");
+            narociButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            narociButton.addActionListener(e -> new NarociPregledWindow(emso));
+
+            JButton showPreglediButton = new JButton("Prikaži preglede");
+            showPreglediButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            showPreglediButton.addActionListener(e -> {
+                List<Object[]> pregledi = Connection.getPreglediForDelavec(emso);
+
+                if (pregledi.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Ta delavec nima nobenih planiranih pregledov.", "Informacija", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    StringBuilder sb = new StringBuilder("Pregledi za delavca " + d[1] + " " + d[2] + ":\n\n");
+                    for (Object[] p : pregledi) {
+                        sb.append("ID: ").append(p[0]).append("\n")
+                                .append("Datum: ").append(p[1]).append("\n")
+                                .append("Opombe: ").append(p[2]).append("\n\n");
+                    }
+
+                    JTextArea textArea = new JTextArea(sb.toString());
+                    textArea.setEditable(false);
+                    JScrollPane scrollPane = new JScrollPane(textArea);
+                    scrollPane.setPreferredSize(new Dimension(400, 300));
+                    JOptionPane.showMessageDialog(this, scrollPane, "Seznam pregledov", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+            });
+            JButton settingsButton = new JButton("Nastavitve");
+            settingsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            settingsButton.addActionListener(e -> {
+                try {
+                    new DelavecSettingsWindow(d, tajnistvoId, oddelekId);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Napaka pri odpiranju nastavitev!" + ex.getMessage(), "Napaka", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+
+            card.add(Box.createVerticalStrut(10));
+            card.add(settingsButton);
+
+            card.add(Box.createVerticalStrut(5));
+            card.add(showPreglediButton);
+            card.add(Box.createVerticalStrut(10));
+            card.add(narociButton);
             card.add(Box.createVerticalStrut(5));
             card.add(imageLabel);
             card.add(Box.createVerticalStrut(10));

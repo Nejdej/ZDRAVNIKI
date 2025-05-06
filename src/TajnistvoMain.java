@@ -70,7 +70,7 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
                     int row = table.getSelectedRow();
                     if (row != -1) {
                         int oddelekId = (int) table.getValueAt(row, 0);
-                        new DelavciMain(oddelekId);
+                        new DelavciMain(oddelekId, id);
                     }
                 }
             }
