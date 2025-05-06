@@ -76,14 +76,22 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
             }
         });
 
-        // Settings Button
+        // Top panel with Logout and Settings
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+        JButton logoutButton = new JButton("⏎ Nazaj / Odjava");
+        logoutButton.addActionListener(e -> {
+            dispose(); // Close current window
+            new startScreen().createAndShowGUI();
+        });
+
         JButton settingsButton = new JButton("⚙ Nastavitve");
-        settingsButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
         settingsButton.addActionListener(e -> new TajnistvoSettings(id, TajnistvoMain.this));
 
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BorderLayout());
-        topPanel.add(settingsButton, BorderLayout.EAST);
+        topPanel.add(logoutButton);
+        topPanel.add(settingsButton);
+
         getContentPane().add(topPanel, BorderLayout.NORTH);
     }
 

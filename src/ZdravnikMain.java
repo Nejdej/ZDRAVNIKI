@@ -37,6 +37,12 @@ public class ZdravnikMain extends JFrame {
             });
             settings.setVisible(true);
         });
+        JButton logoutButton = new JButton("⏎ Nazaj / Odjava");
+        logoutButton.addActionListener(e -> {
+            dispose();
+            new startScreen().createAndShowGUI();
+        });
+        topPanel.add(logoutButton, BorderLayout.WEST);
         topPanel.add(settingsButton, BorderLayout.EAST);
 
         rightPanel.add(topPanel, BorderLayout.NORTH);

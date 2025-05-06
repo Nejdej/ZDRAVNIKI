@@ -9,7 +9,7 @@ public class startScreen {
         SwingUtilities.invokeLater(() -> new startScreen().createAndShowGUI());
     }
 
-    private void createAndShowGUI() {
+    public void createAndShowGUI() {
         JFrame frame = new JFrame("Login Screen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 200);
