@@ -419,7 +419,7 @@ public class Connection {
         }
     }
 
-    public void updajtajOddelek(int oid, String oime, String oopis, String tiime) {
+    public static void updajtajOddelek(int oid, String oime, String oopis, String tiime) {
         try {
             java.sql.Connection conn = connectToDatabase();
             PreparedStatement stmt = conn.prepareStatement("SELECT updajtajOddelek(?, ?, ?, ?)");
@@ -434,7 +434,7 @@ public class Connection {
         }
     }
 
-    public void deletajOddelek(int oid) {
+    public static void deletajOddelek(int oid) {
         try {
             java.sql.Connection conn = connectToDatabase();
             PreparedStatement stmt = conn.prepareStatement("SELECT deletajOddelek(?)");
@@ -445,7 +445,7 @@ public class Connection {
             e.printStackTrace();
         }
     }
-    public List<String> prikaziOddelek(int oid) {
+    public static List<String> prikaziOddelek(int oid) {
         List<String> data = new ArrayList<>();
         try {
             java.sql.Connection conn = connectToDatabase();

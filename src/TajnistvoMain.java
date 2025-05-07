@@ -3,14 +3,17 @@ package src;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
 
-    private int id;
+    private static int id;
     private JLabel label1;
     private JLabel label3;
+    private static DefaultTableModel model;
+    private static JTable table;
 
     public TajnistvoMain(int id, String ime, String glavniTajnikCa) {
         this.id = id;
@@ -37,14 +40,14 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
         String[] columnNames = {"ID", "Ime oddelka", "Opis", "Tajništvo"};
         Object[][] data = Connection.getOddelkiForTajnistvo(id);
 
-        DefaultTableModel model = new DefaultTableModel(data, columnNames) {
+        model = new DefaultTableModel(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
 
-        JTable table = new JTable(model);
+        table = new JTable(model);
 
         // Hide ID and Tajnistvo columns
         table.getColumnModel().getColumn(0).setMinWidth(0);
@@ -76,7 +79,7 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
             }
         });
 
-        // Top panel with Logout and Settings
+        // Top panel with Logout, Settings, and Refresh button
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
@@ -89,8 +92,12 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
         JButton settingsButton = new JButton("⚙ Nastavitve");
         settingsButton.addActionListener(e -> new TajnistvoSettings(id, TajnistvoMain.this));
 
+        JButton refreshButton = new JButton("🔄 Osveži");
+        refreshButton.addActionListener(e -> refreshTable());
+
         topPanel.add(logoutButton);
         topPanel.add(settingsButton);
+        topPanel.add(refreshButton);
 
         getContentPane().add(topPanel, BorderLayout.NORTH);
     }
@@ -105,5 +112,22 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
             label1.setText("Pozdravljeni, " + ime + "!");
             label3.setText("Glavni tajnik/ca: " + glavniTajnikCa);
         }
+    }
+
+    // Method to refresh the table data
+    public static void refreshTable() {
+        Object[][] data = Connection.getOddelkiForTajnistvo(id);
+        String[] columnNames = {"ID", "Ime oddelka", "Opis", "Tajništvo"};
+
+        model.setDataVector(data, columnNames);
+
+        // Re-hide ID and Tajnistvo columns on the actual table
+        table.getColumnModel().getColumn(0).setMinWidth(0);
+        table.getColumnModel().getColumn(0).setMaxWidth(0);
+        table.getColumnModel().getColumn(0).setWidth(0);
+
+        table.getColumnModel().getColumn(3).setMinWidth(0);
+        table.getColumnModel().getColumn(3).setMaxWidth(0);
+        table.getColumnModel().getColumn(3).setWidth(0);
     }
 }

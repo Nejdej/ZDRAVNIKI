@@ -20,13 +20,32 @@ public class DelavciMain extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        // Top panel with both buttons
+        JPanel topPanel = new JPanel(new BorderLayout());
+
+        JPanel leftButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton dodajDelavcaButton = new JButton("Dodaj Delavca");
         dodajDelavcaButton.addActionListener(e -> new InsertDelavecWindow(tajnistvoId, oddelekId, this));
+        leftButtons.add(dodajDelavcaButton);
 
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topPanel.add(dodajDelavcaButton);
+        JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton nastavitveButton = new JButton("Nastavitve");
+        nastavitveButton.addActionListener(e -> {
+            try {
+                new OddelekSettingsWindow(oddelekId, this); // `true` indicates tajnistvo can't be changed
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Napaka pri odpiranju nastavitev tajništva: " + ex.getMessage(), "Napaka", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        rightButtons.add(nastavitveButton);
+
+        topPanel.add(leftButtons, BorderLayout.WEST);
+        topPanel.add(rightButtons, BorderLayout.EAST);
+
         add(topPanel, BorderLayout.NORTH);
 
+        // Grid of workers
         gridPanel = new JPanel();
         gridPanel.setLayout(new GridLayout(0, 3, 10, 10)); // 3 items per row
         scrollPane = new JScrollPane(gridPanel);
@@ -34,7 +53,6 @@ public class DelavciMain extends JFrame {
         add(scrollPane);
 
         refreshData();
-
         setVisible(true);
     }
 
@@ -83,7 +101,6 @@ public class DelavciMain extends JFrame {
             showPreglediButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             showPreglediButton.addActionListener(e -> {
                 List<Object[]> pregledi = Connection.getPreglediForDelavec(emso);
-
                 if (pregledi.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Ta delavec nima nobenih planiranih pregledov.", "Informacija", JOptionPane.INFORMATION_MESSAGE);
                 } else {
