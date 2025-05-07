@@ -20,6 +20,13 @@ public class DelavciMain extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        JButton dodajDelavcaButton = new JButton("Dodaj Delavca");
+        dodajDelavcaButton.addActionListener(e -> new InsertDelavecWindow(tajnistvoId, oddelekId, this));
+
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.add(dodajDelavcaButton);
+        add(topPanel, BorderLayout.NORTH);
+
         gridPanel = new JPanel();
         gridPanel.setLayout(new GridLayout(0, 3, 10, 10)); // 3 items per row
         scrollPane = new JScrollPane(gridPanel);

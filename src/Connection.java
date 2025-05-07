@@ -396,8 +396,73 @@ public class Connection {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Napaka pri pridobivanju oddelkov!", "Napaka", JOptionPane.ERROR_MESSAGE);
         }
-
         return oddelki;
     }
+    public static void insertajDelavca(String ime, String priimek, String emso, String telefon, String slikica, String oddelekIme) {
+        String query = "SELECT insertajDelavca(?, ?, ?, ?, ?, ?)";
 
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, ime);
+            stmt.setString(2, priimek);
+            stmt.setString(3, emso);
+            stmt.setString(4, telefon);
+            stmt.setString(5, slikica);
+            stmt.setString(6, oddelekIme);
+
+            stmt.execute(); // No ResultSet needed since it returns void
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Napaka pri vstavljanju delavca!", "Napaka", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void updajtajOddelek(int oid, String oime, String oopis, String tiime) {
+        try {
+            java.sql.Connection conn = connectToDatabase();
+            PreparedStatement stmt = conn.prepareStatement("SELECT updajtajOddelek(?, ?, ?, ?)");
+            stmt.setInt(1, oid);
+            stmt.setString(2, oime);
+            stmt.setString(3, oopis);
+            stmt.setString(4, tiime);
+            stmt.execute();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deletajOddelek(int oid) {
+        try {
+            java.sql.Connection conn = connectToDatabase();
+            PreparedStatement stmt = conn.prepareStatement("SELECT deletajOddelek(?)");
+            stmt.setInt(1, oid);
+            stmt.execute();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public List<String> prikaziOddelek(int oid) {
+        List<String> data = new ArrayList<>();
+        try {
+            java.sql.Connection conn = connectToDatabase();
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM prikaziOddelek(?)");
+            stmt.setInt(1, oid);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                data.add(String.valueOf(rs.getInt("iid")));
+                data.add(rs.getString("iime"));
+                data.add(rs.getString("oopis"));
+                data.add(rs.getString("ttajnistvo"));
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
 }

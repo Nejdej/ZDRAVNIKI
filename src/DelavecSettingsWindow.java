@@ -86,8 +86,22 @@ public class DelavecSettingsWindow extends JFrame {
             dispose();
         });
 
+        JButton deleteButton = new JButton("Izbriši");
+        deleteButton.setForeground(Color.RED);
+        deleteButton.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this, "Ali si prepričan, da želiš izbrisati tega delavca?", "Potrditev brisanja", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                Connection.deletajDelavca(currentEmso);
+                JOptionPane.showMessageDialog(this, "Delavec uspešno izbrisan!");
+                parent.refreshData();
+                dispose();
+            }
+        });
+
         mainPanel.add(Box.createVerticalStrut(15));
         mainPanel.add(updateButton);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(deleteButton);
 
         add(mainPanel, BorderLayout.CENTER);
         setVisible(true);
