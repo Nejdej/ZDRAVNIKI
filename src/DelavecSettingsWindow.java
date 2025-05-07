@@ -7,7 +7,7 @@ import java.util.List;
 
 public class DelavecSettingsWindow extends JFrame {
 
-    public DelavecSettingsWindow(Object[] delavecData, int tajnistvoId, int oddelekId) {
+    public DelavecSettingsWindow(Object[] delavecData, int tajnistvoId, int oddelekId, DelavciMain parent) {
         setTitle("Nastavitve Delavca");
         setSize(400, 600);
         setLocationRelativeTo(null);
@@ -17,15 +17,12 @@ public class DelavecSettingsWindow extends JFrame {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-        // Extract delavec data
         String ime = (String) delavecData[1];
         String priimek = (String) delavecData[2];
         String currentEmso = (String) delavecData[3];
         String telefon = (String) delavecData[4];
         String slikaBase64 = (String) delavecData[5];
 
-
-        // Image preview
         JLabel imageLabel = new JLabel();
         if (slikaBase64 != null && !slikaBase64.isEmpty()) {
             try {
@@ -40,13 +37,11 @@ public class DelavecSettingsWindow extends JFrame {
             imageLabel.setText("Slika ni na voljo");
         }
 
-        // Input fields
         JTextField imeField = new JTextField(ime);
         JTextField priimekField = new JTextField(priimek);
-        JTextField emsoField = new JTextField(currentEmso); // can allow editing
+        JTextField emsoField = new JTextField(currentEmso);
         JTextField telefonField = new JTextField(telefon);
 
-        // Dropdown for oddelki
         JComboBox<String> oddelekDropdown = new JComboBox<>();
         List<Object[]> oddelki = Connection.prikaziOddelkeVTajnistvu(tajnistvoId);
         String selectedOddelekIme = null;
@@ -61,7 +56,6 @@ public class DelavecSettingsWindow extends JFrame {
             oddelekDropdown.setSelectedItem(selectedOddelekIme);
         }
 
-        // Layout
         mainPanel.add(new JLabel("Ime:"));
         mainPanel.add(imeField);
         mainPanel.add(new JLabel("Priimek:"));
@@ -75,7 +69,6 @@ public class DelavecSettingsWindow extends JFrame {
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(imageLabel);
 
-        // Update button
         JButton updateButton = new JButton("Posodobi");
         updateButton.addActionListener(e -> {
             String newIme = imeField.getText();
@@ -89,6 +82,7 @@ public class DelavecSettingsWindow extends JFrame {
             );
 
             JOptionPane.showMessageDialog(this, "Delavec uspešno posodobljen!");
+            parent.refreshData();  // Refresh the DelavciMain instance
             dispose();
         });
 

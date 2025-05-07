@@ -6,17 +6,35 @@ import java.util.Base64;
 import java.util.List;
 
 public class DelavciMain extends JFrame {
+    private JPanel gridPanel;
+    private JScrollPane scrollPane;
+    private int oddelekId;
+    private int tajnistvoId;
 
     public DelavciMain(int oddelekId, int tajnistvoId) {
+        this.oddelekId = oddelekId;
+        this.tajnistvoId = tajnistvoId;
+
         setTitle("Delavci v Oddelku");
         setSize(800, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        List<Object[]> delavci = Connection.getDelavciForOddelek(oddelekId);
-
-        JPanel gridPanel = new JPanel();
+        gridPanel = new JPanel();
         gridPanel.setLayout(new GridLayout(0, 3, 10, 10)); // 3 items per row
+        scrollPane = new JScrollPane(gridPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        add(scrollPane);
+
+        refreshData();
+
+        setVisible(true);
+    }
+
+    public void refreshData() {
+        gridPanel.removeAll();
+
+        List<Object[]> delavci = Connection.getDelavciForOddelek(oddelekId);
 
         for (Object[] d : delavci) {
             JPanel card = new JPanel();
@@ -33,7 +51,6 @@ public class DelavciMain extends JFrame {
             phone.setAlignmentX(Component.CENTER_ALIGNMENT);
             kraj.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            // Optional: Show image if exists (assuming base64 or URL or null)
             JLabel imageLabel = new JLabel();
             String imageData = (String) d[5];
             if (imageData != null && !imageData.isEmpty()) {
@@ -49,7 +66,8 @@ public class DelavciMain extends JFrame {
             }
             imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            String emso = (String) d[3]; // assuming emso is at index 3
+            String emso = (String) d[3];
+
             JButton narociButton = new JButton("Naroči");
             narociButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             narociButton.addActionListener(e -> new NarociPregledWindow(emso));
@@ -71,26 +89,25 @@ public class DelavciMain extends JFrame {
 
                     JTextArea textArea = new JTextArea(sb.toString());
                     textArea.setEditable(false);
-                    JScrollPane scrollPane = new JScrollPane(textArea);
-                    scrollPane.setPreferredSize(new Dimension(400, 300));
-                    JOptionPane.showMessageDialog(this, scrollPane, "Seznam pregledov", JOptionPane.INFORMATION_MESSAGE);
+                    JScrollPane sp = new JScrollPane(textArea);
+                    sp.setPreferredSize(new Dimension(400, 300));
+                    JOptionPane.showMessageDialog(this, sp, "Seznam pregledov", JOptionPane.INFORMATION_MESSAGE);
                 }
-
             });
+
             JButton settingsButton = new JButton("Nastavitve");
             settingsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             settingsButton.addActionListener(e -> {
                 try {
-                    new DelavecSettingsWindow(d, tajnistvoId, oddelekId);
+                    new DelavecSettingsWindow(d, tajnistvoId, oddelekId, this);
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Napaka pri odpiranju nastavitev!" + ex.getMessage(), "Napaka", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Napaka pri odpiranju nastavitev! " + ex.getMessage(), "Napaka", JOptionPane.ERROR_MESSAGE);
                 }
             });
 
             card.add(Box.createVerticalStrut(10));
             card.add(settingsButton);
-
             card.add(Box.createVerticalStrut(5));
             card.add(showPreglediButton);
             card.add(Box.createVerticalStrut(10));
@@ -106,10 +123,7 @@ public class DelavciMain extends JFrame {
             gridPanel.add(card);
         }
 
-        JScrollPane scrollPane = new JScrollPane(gridPanel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-        add(scrollPane);
-        setVisible(true);
+        gridPanel.revalidate();
+        gridPanel.repaint();
     }
 }

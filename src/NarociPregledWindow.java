@@ -2,6 +2,7 @@ package src;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Calendar;
 import java.util.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -11,7 +12,7 @@ public class NarociPregledWindow extends JFrame {
 
     public NarociPregledWindow(String emso) {
         setTitle("Naroči Pregled");
-        setSize(400, 300);
+        setSize(600, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
@@ -74,9 +75,14 @@ public class NarociPregledWindow extends JFrame {
                 int year = (int) yearBox.getSelectedItem();
 
                 Date time = (Date) timeSpinner.getValue();
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(time);
+                int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                int minute = calendar.get(Calendar.MINUTE);
+
                 LocalDateTime localDateTime = LocalDateTime.of(
                         year, month, day,
-                        time.getHours(), time.getMinutes()
+                        hour, minute
                 );
 
                 Timestamp datum = Timestamp.valueOf(localDateTime);
