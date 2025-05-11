@@ -201,8 +201,24 @@ public class ZdravnikMain extends JFrame {
             }
         });
 
+        preglediTable.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2 && preglediTable.getSelectedRow() != -1) {
+                    int row = preglediTable.getSelectedRow();
+                    String id = (String) preglediTable.getValueAt(row, 0);
+                    String datumString = preglediTable.getValueAt(row, 1).toString(); // format: yyyy-MM-dd HH:mm:ss
+                    String opombe = preglediTable.getValueAt(row, 2).toString();
+                    String emso = preglediTable.getValueAt(row, 3).toString();
+
+                    PregledSettings ps = new PregledSettings(id, datumString, opombe, emso);
+                    ps.setVisible(true);
+                }
+            }
+        });
         setVisible(true);
     }
+
+
 
     private void setPreglediTable(List<Object[]> dataList, String[] columns) {
         Object[][] data = dataList.toArray(new Object[0][]);

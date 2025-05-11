@@ -595,4 +595,38 @@ public class Connection {
 
         return preglediList;
     }
+
+    public static void updajtajPregled(String oldId, String newId, Timestamp datum, String opombe, String emso) {
+        String query = "SELECT updajtajPregled(?, ?, ?, ?, ?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, oldId);
+            stmt.setString(2, newId);
+            stmt.setTimestamp(3, datum);
+            stmt.setString(4, opombe);
+            stmt.setString(5, emso);
+
+            stmt.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Napaka pri posodabljanju pregleda!", "Napaka", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    public static void deletajPregled(String id) {
+        String query = "SELECT deletajPregled(?::varchar)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, id);  // id as varchar
+
+            stmt.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Napaka pri brisanju pregleda!", "Napaka", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 }

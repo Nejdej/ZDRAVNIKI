@@ -22,18 +22,18 @@ public class NarociPregledWindow extends JFrame {
         dateTimePanel.add(new JLabel("Datum in ura:"));
 
         JComboBox<Integer> dayBox = new JComboBox<>();
-        for (int i = 1; i <= 31; i++) dayBox.addItem(i);
+        for (int i = 1; i <= 31; i++) dayBox.addItem(Integer.valueOf(i));
         dateTimePanel.add(dayBox);
         dateTimePanel.add(new JLabel("."));
 
         JComboBox<Integer> monthBox = new JComboBox<>();
-        for (int i = 1; i <= 12; i++) monthBox.addItem(i);
+        for (int i = 1; i <= 12; i++) monthBox.addItem(Integer.valueOf(i));
         dateTimePanel.add(monthBox);
         dateTimePanel.add(new JLabel("."));
 
         JComboBox<Integer> yearBox = new JComboBox<>();
         int currentYear = LocalDate.now().getYear();
-        for (int i = currentYear; i <= currentYear + 5; i++) yearBox.addItem(i);
+        for (int i = currentYear; i <= currentYear + 5; i++) yearBox.addItem(Integer.valueOf(i));
         dateTimePanel.add(yearBox);
         dateTimePanel.add(new JLabel(" ob "));
 
