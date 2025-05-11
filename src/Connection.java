@@ -64,7 +64,7 @@ public class Connection {
                     String glavniTajnikCa = rs.getString("gglavnia_tajnikca");
 
                     if (id != -1) {
-                        result = new Object[]{id, ime, glavniTajnikCa};
+                        result = new Object[]{(Object) id, ime, glavniTajnikCa};
                     }
                 }
             }
@@ -94,7 +94,7 @@ public class Connection {
                 data = new Object[rowCount][4];
                 int i = 0;
                 while (rs.next()) {
-                    data[i][0] = rs.getInt("iid");
+                    data[i][0] = (Object) rs.getInt("iid");
                     data[i][1] = rs.getString("iime");
                     data[i][2] = rs.getString("oopis");
                     data[i][3] = rs.getString("ttajnistvo");
@@ -119,7 +119,7 @@ public class Connection {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Object[] worker = new Object[]{
-                            rs.getInt("iid"),
+                            (Object) rs.getInt("iid"),
                             rs.getString("iime"),
                             rs.getString("ppriimek"),
                             rs.getString("eemso"),
@@ -150,7 +150,7 @@ public class Connection {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Object[] row = new Object[7];
-                row[0] = rs.getInt("iid");
+                row[0] = (Object) rs.getInt("iid");
                 row[1] = rs.getString("iime");
                 row[2] = rs.getString("eemail");
                 row[3] = rs.getString("ttelefon");
@@ -210,7 +210,7 @@ public class Connection {
 
             if (rs.next()) {
                 tajnistvo = new Object[8];
-                tajnistvo[0] = rs.getInt("iid");
+                tajnistvo[0] = (Object) rs.getInt("iid");
                 tajnistvo[1] = rs.getString("iime");
                 tajnistvo[2] = rs.getString("eemail");
                 tajnistvo[3] = rs.getString("ttelefon");
@@ -259,7 +259,7 @@ public class Connection {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Object[] row = new Object[3];
-                row[0] = rs.getInt("iid");     // ID
+                row[0] = (Object) rs.getInt("iid");     // ID
                 row[1] = rs.getString("iime"); // Name
                 row[2] = rs.getString("pposta"); // Posta
                 kraji.add(row);
@@ -281,7 +281,7 @@ public class Connection {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 kraj = new Object[]{
-                        rs.getInt("iid"),
+                        (Object) rs.getInt("iid"),
                         rs.getString("iime"),
                         rs.getString("pposta")
                 };
@@ -385,7 +385,7 @@ public class Connection {
 
             while (rs.next()) {
                 Object[] row = new Object[4];
-                row[0] = rs.getInt("iid");
+                row[0] = (Object) rs.getInt("iid");
                 row[1] = rs.getString("iime");
                 row[2] = rs.getString("oopis");
                 row[3] = rs.getString("ttajnistvo");
@@ -538,4 +538,61 @@ public class Connection {
         return mergedList;
     }
 
+    public static List<Object[]> getPreglediForTajnistvo(int tid) {
+        List<Object[]> preglediList = new ArrayList<>();
+        String query = "SELECT * FROM prikaziPregledTajnistva(?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, tid);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Object[] row = {
+                            rs.getString("iid"),
+                            rs.getTimestamp("ddatum"),
+                            rs.getString("oopombe"),
+                            rs.getString("eemso")
+                    };
+                    preglediList.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Napaka pri pridobivanju pregledov!", "Napaka", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return preglediList;
+    }
+
+    public static List<Object[]> getPreglediForOddelek(int oddelekId) {
+        List<Object[]> preglediList = new ArrayList<>();
+        String query = "SELECT * FROM prikaziPregledOddelka(?)"; // Calling the function
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            // Set the ID parameter for the query
+            stmt.setInt(1, oddelekId);
+
+            // Execute the query
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    // Extract the data from the result set and add it to the list
+                    Object[] pregledi = new Object[]{
+                            rs.getString("iid"),
+                            rs.getTimestamp("ddatum"),
+                            rs.getString("oopombe"),
+                            rs.getString("eemso")
+                    };
+                    preglediList.add(pregledi);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error retrieving pregledi for oddelek: " + e.getMessage());
+        }
+
+        return preglediList;
+    }
 }
