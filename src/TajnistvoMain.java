@@ -18,7 +18,7 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
     public TajnistvoMain(int id, String ime, String glavniTajnikCa) {
         this.id = id;
 
-        setTitle("Tajništvo Portal");
+        setTitle("Portal " + ime);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 400);
         setLocationRelativeTo(null);
@@ -63,6 +63,12 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
         panel.add(scrollPane);
         panel.add(Box.createVerticalGlue());
 
+        JButton dodajButton = new JButton("➕ Dodaj oddelek");
+        dodajButton.addActionListener(e -> new DodajOddelekWindow(id, TajnistvoMain.this));
+
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(dodajButton);
+
         add(panel);
         setVisible(true);
 
@@ -90,9 +96,9 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
         });
 
         JButton settingsButton = new JButton("⚙ Nastavitve");
-        settingsButton.addActionListener(e -> new TajnistvoSettings(id, TajnistvoMain.this));
+        settingsButton.addActionListener(e -> new TajnistvoSettings(id, TajnistvoMain.this, TajnistvoMain.this));
 
-        JButton refreshButton = new JButton("🔄 Osveži");
+        JButton refreshButton = new JButton("Osveži");
         refreshButton.addActionListener(e -> refreshTable());
 
         topPanel.add(logoutButton);

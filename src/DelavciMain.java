@@ -15,7 +15,7 @@ public class DelavciMain extends JFrame {
         this.oddelekId = oddelekId;
         this.tajnistvoId = tajnistvoId;
 
-        setTitle("Delavci v Oddelku");
+        setTitle("Delavci v oddelku");
         setSize(800, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

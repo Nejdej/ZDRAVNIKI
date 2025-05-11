@@ -465,4 +465,77 @@ public class Connection {
         }
         return data;
     }
+    public static void insertajOddelek(String oime, String oopis, String tiime) {
+        String query = "SELECT insertajOddelek(?, ?, ?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, oime);
+            stmt.setString(2, oopis);
+            stmt.setString(3, tiime);
+
+            stmt.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Napaka pri vstavljanju oddelka!", "Napaka", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public static void deleteTajnistvo(int id) {
+        String query = "SELECT deletajTajnistvo(?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, id);
+            stmt.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Napaka pri brisanju tajništva!", "Napaka", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public static List<Object[]> getAllPregledi() {
+        List<Object[]> mergedList = new ArrayList<>();
+
+        String normalQuery = "SELECT * FROM prikaziPreglede()";
+        String deletedQuery = "SELECT * FROM prikaziPregledeDeleted()";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement normalStmt = conn.prepareStatement(normalQuery);
+             PreparedStatement deletedStmt = conn.prepareStatement(deletedQuery)) {
+
+            ResultSet rsNormal = normalStmt.executeQuery();
+            while (rsNormal.next()) {
+                Object[] row = {
+                        rsNormal.getString("iid"),
+                        rsNormal.getTimestamp("ddatum"),
+                        rsNormal.getString("oopombe"),
+                        rsNormal.getString("eemso")
+                };
+                mergedList.add(row);
+            }
+
+            ResultSet rsDeleted = deletedStmt.executeQuery();
+            while (rsDeleted.next()) {
+                Object[] row = {
+                        rsDeleted.getString("iid"),
+                        rsDeleted.getTimestamp("ddatum"),
+                        rsDeleted.getString("oopombe"),
+                        rsDeleted.getString("eemso")
+                };
+                mergedList.add(row);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Napaka pri pridobivanju pregledov!", "Napaka", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return mergedList;
+    }
+
 }

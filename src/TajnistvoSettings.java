@@ -7,7 +7,7 @@ import java.util.List;
 
 public class TajnistvoSettings extends JFrame {
 
-    public TajnistvoSettings(int id, TajnistvoUpdateListener listener) {
+    public TajnistvoSettings(int id, TajnistvoUpdateListener listener, TajnistvoMain parent) {
         setTitle("Nastavitve Tajništva");
         setSize(400, 500);
         setLocationRelativeTo(null);
@@ -90,6 +90,20 @@ public class TajnistvoSettings extends JFrame {
                 }
 
                 dispose();
+            }
+        });
+
+        JButton deleteButton = new JButton("Izbriši");
+        panel.add(deleteButton);
+
+        deleteButton.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(null, "Ste prepričani, da želite izbrisati tajništvo?", "Potrditev brisanja", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                Connection.deleteTajnistvo(id);
+
+                dispose();
+                parent.dispose();
+                SwingUtilities.invokeLater(() -> new startScreen().createAndShowGUI());
             }
         });
 

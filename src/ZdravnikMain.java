@@ -10,13 +10,31 @@ public class ZdravnikMain extends JFrame {
     public ZdravnikMain(String ime, String sifra) {
         setTitle("Zdravnik Portal");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 400);
+        setSize(1200, 400);
         setLocationRelativeTo(null);
         setLayout(new GridLayout(1, 2)); // Vertical split: left - pregledi, right - tajnistva
 
         // Placeholder for "pregledi"
-        JPanel leftPanel = new JPanel();
-        leftPanel.add(new JLabel("Pregledi (coming soon...)"));
+        JPanel leftPanel = new JPanel(new BorderLayout());
+
+        JButton showPreglediButton = new JButton("Prikaži vse preglede");
+        JTable preglediTable = new JTable();
+        JScrollPane preglediScrollPane = new JScrollPane(preglediTable);
+
+        showPreglediButton.addActionListener(e -> {
+            String[] preglediColumns = {"ID", "Datum", "Opombe", "EMŠO"};
+            List<Object[]> preglediList = Connection.getAllPregledi(); // <-- New method
+            Object[][] preglediData = preglediList.toArray(new Object[0][]);
+            DefaultTableModel preglediModel = new DefaultTableModel(preglediData, preglediColumns) {
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+            preglediTable.setModel(preglediModel);
+        });
+
+        leftPanel.add(showPreglediButton, BorderLayout.NORTH);
+        leftPanel.add(preglediScrollPane, BorderLayout.CENTER);
         add(leftPanel);
 
         // Right Panel for Tajnistva
