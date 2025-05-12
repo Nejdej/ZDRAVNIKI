@@ -94,7 +94,7 @@ public class Connection {
                 data = new Object[rowCount][4];
                 int i = 0;
                 while (rs.next()) {
-                    data[i][0] = (Object) rs.getInt("iid");
+                    data[i][0] = rs.getInt("iid");
                     data[i][1] = rs.getString("iime");
                     data[i][2] = rs.getString("oopis");
                     data[i][3] = rs.getString("ttajnistvo");
@@ -675,6 +675,26 @@ public class Connection {
             System.out.println("Error inserting tajnistvo: " + e.getMessage());
         }
         return false;
+    }
+
+    public static boolean pokreniPregledeZaOddelek(int oddelekId, String idLetosnjegaLeta, Timestamp datum, String opombe) {
+        String call = "{ call oddelekcelpregled(?, ?, ?, ?) }";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             CallableStatement stmt = conn.prepareCall(call)) {
+
+            stmt.setInt(1, oddelekId);
+            stmt.setString(2, idLetosnjegaLeta);
+            stmt.setTimestamp(3, datum);
+            stmt.setString(4, opombe);
+
+            stmt.execute(); // It returns VOID, so we just execute
+            return true;
+
+        } catch (SQLException e) {
+            System.out.println("Napaka pri izvajanju oddelekcelpregled: " + e.getMessage());
+            return false;
+        }
     }
 
 }

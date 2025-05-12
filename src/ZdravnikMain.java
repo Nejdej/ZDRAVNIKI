@@ -135,6 +135,15 @@ public class ZdravnikMain extends JFrame {
 
         rightPanel.add(topPanel, BorderLayout.NORTH);
 
+        // Create bottom panel with Naroči button
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton narociButton = new JButton("Naroči pregled");
+        narociButton.setEnabled(false);
+        bottomPanel.add(narociButton);
+
+// Add bottom panel to rightPanel
+        rightPanel.add(bottomPanel, BorderLayout.SOUTH);
+
         // Tabs for Tajnistva / Oddelki / Delavci
         tabbedPane = new JTabbedPane();
 
@@ -174,20 +183,52 @@ public class ZdravnikMain extends JFrame {
                     updateOddelkiForTajnistvo(tajnistvoId);
                     tabbedPane.setSelectedIndex(1); // Switch to Oddelki
                 }
+                if (e.getClickCount() == 1) {
+                    narociButton.setEnabled(false); // Enable the button
+                }
             }
         });
 
         // Double click on oddelek
         oddelkiTable.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 1) {
+                    narociButton.setEnabled(true); // Enable the button
+                }
+
                 if (e.getClickCount() == 2) {
                     int row = oddelkiTable.getSelectedRow();
                     int oddelekId = (int) oddelkiTable.getValueAt(row, 0);
                     updatePreglediForOddelek(oddelekId);
                     updateDelavciForOddelek(oddelekId);
-                    tabbedPane.setSelectedIndex(2); // Switch to Delavci
+                    tabbedPane.setSelectedIndex(2);
                 }
             }
+        });
+
+        narociButton.addActionListener(e -> {
+            int selectedTab = tabbedPane.getSelectedIndex();
+
+            // If we're on the Delavci tab (assuming index 2)
+            if (selectedTab == 2) {
+                int selectedRow = delavciTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    String emso = delavciTable.getValueAt(selectedRow, 3).toString();
+                    new NarociPregledWindow(emso); // <-- Opens the NarociPregledWindow
+                }
+            }
+
+            // If we're on the Oddelki tab (assuming index 1)
+            else if (selectedTab == 1) {
+                int selectedRow = oddelkiTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    int oddelekId = (int) oddelkiTable.getValueAt(selectedRow, 0);
+                    new OddelekNaroci(oddelekId).setVisible(true);
+                    // You probably don’t want to open NarociPregledWindow here unless you also have EMŠO
+                }
+            }
+
+            // Else do nothing or disable button
         });
 
         // Double click on delavec
@@ -197,6 +238,9 @@ public class ZdravnikMain extends JFrame {
                     int row = delavciTable.getSelectedRow();
                     String emso = delavciTable.getValueAt(row, 3).toString(); // 4th column is EMŠO
                     updatePreglediForDelavec(emso);
+                }
+                if (e.getClickCount() == 1) {
+                    narociButton.setEnabled(true); // Enable the button
                 }
             }
         });

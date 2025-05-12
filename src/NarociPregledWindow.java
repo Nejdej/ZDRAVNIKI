@@ -89,7 +89,7 @@ public class NarociPregledWindow extends JFrame {
                 Connection.insertajPregled(String.valueOf(year), datum, opombe, emso);
 
                 JOptionPane.showMessageDialog(this, "Pregled uspešno dodan!", "Uspeh", JOptionPane.INFORMATION_MESSAGE);
-                dispose();
+                this.dispose();
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Napaka pri vnosu pregleda!", "Napaka", JOptionPane.ERROR_MESSAGE);
