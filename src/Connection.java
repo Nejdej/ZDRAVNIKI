@@ -629,4 +629,52 @@ public class Connection {
             JOptionPane.showMessageDialog(null, "Napaka pri brisanju pregleda!", "Napaka", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    public static String insertajZdravnika(String patronsifra, String ssifra, String nnaziv) {
+        String result = null;
+        String query = "SELECT insertajZdravnika(?, ?, ?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, patronsifra);
+            stmt.setString(2, ssifra);
+            stmt.setString(3, nnaziv);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    result = rs.getString(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error inserting zdravnik: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    public static boolean insertajTajnistvo(String ime, String email, String telefon,
+                                            String glavniTajnikCa, String naslov, String posta, String pass) {
+        String query = "SELECT insertajTajnistvo(?, ?, ?, ?, ?, ?, ?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, ime);
+            stmt.setString(2, email);
+            stmt.setString(3, telefon);
+            stmt.setString(4, glavniTajnikCa);
+            stmt.setString(5, naslov);
+            stmt.setString(6, posta);
+            stmt.setString(7, pass);
+
+            stmt.execute(); // No result expected, just execute
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error inserting tajnistvo: " + e.getMessage());
+        }
+        return false;
+    }
+
 }

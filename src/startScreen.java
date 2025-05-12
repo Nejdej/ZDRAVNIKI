@@ -12,34 +12,43 @@ public class startScreen {
     public void createAndShowGUI() {
         JFrame frame = new JFrame("Login Screen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 200);
+        frame.setSize(500, 250);
         frame.setLocationRelativeTo(null);
 
-        // Left panel: Label + Šifra + Login button
-        JPanel leftPanel = new JPanel(new GridLayout(3, 1));
+        // Left panel: Doktor login and registration
+        JPanel leftPanel = new JPanel(new GridLayout(4, 1));
         JLabel doktorLabel = new JLabel("DOKTOR", SwingConstants.CENTER);
         JTextField sifraField = new JTextField();
         JButton sifraLoginButton = new JButton("Login");
+        JLabel doktorRegistration = new JLabel("<HTML><U>Registracija</U></HTML>", SwingConstants.CENTER);
+        doktorRegistration.setForeground(Color.MAGENTA);
+        doktorRegistration.setCursor(new Cursor(Cursor.HAND_CURSOR));
         leftPanel.add(doktorLabel);
         leftPanel.add(sifraField);
         leftPanel.add(sifraLoginButton);
+        leftPanel.add(doktorRegistration);
 
-        // Right panel: Label + Email + Password + Login button
-        JPanel rightPanel = new JPanel(new GridLayout(4, 1));
+        // Right panel: Tajništva login and registration
+        JPanel rightPanel = new JPanel(new GridLayout(5, 1));
         JLabel tajnistvoLabel = new JLabel("TAJNIŠTVA", SwingConstants.CENTER);
         JTextField emailField = new JTextField();
         JPasswordField passwordField = new JPasswordField();
         JButton emailLoginButton = new JButton("Login");
+        JLabel tajnistvoRegistration = new JLabel("<HTML><U>Registracija</U></HTML>", SwingConstants.CENTER);
+        tajnistvoRegistration.setForeground(Color.MAGENTA);
+        tajnistvoRegistration.setCursor(new Cursor(Cursor.HAND_CURSOR));
         rightPanel.add(tajnistvoLabel);
         rightPanel.add(emailField);
         rightPanel.add(passwordField);
         rightPanel.add(emailLoginButton);
+        rightPanel.add(tajnistvoRegistration);
 
-        // Split pane to divide left and right
+        // Split pane
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
         splitPane.setResizeWeight(0.5);
+        splitPane.setDividerLocation(frame.getWidth() / 2);
 
-        // Add action for doktor login
+        // DOKTOR login
         sifraLoginButton.addActionListener(e -> {
             String sifra = sifraField.getText().trim();
             if (sifra.isEmpty()) {
@@ -57,6 +66,7 @@ public class startScreen {
             }
         });
 
+        // TAJNIŠTVA login
         emailLoginButton.addActionListener(e -> {
             String email = emailField.getText().trim();
             String password = new String(passwordField.getPassword()).trim();
@@ -77,6 +87,19 @@ public class startScreen {
                 new TajnistvoMain(id, ime, glavniTajnikCa);
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Clickable registration labels
+        doktorRegistration.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                new ZdravnikRegistrationDialog(frame);
+            }
+        });
+
+        tajnistvoRegistration.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                new TajnistvoRegistrationDialog(frame);
             }
         });
 

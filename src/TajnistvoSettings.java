@@ -29,6 +29,7 @@ public class TajnistvoSettings extends JFrame {
         for (Object[] kraj : kraji) {
             krajDropdown.addItem(kraj[2] + " - " + kraj[1]);
         }
+        krajDropdown.setSelectedItem(null);
 
         panel.add(new JLabel("Ime:"));
         panel.add(imeField);
