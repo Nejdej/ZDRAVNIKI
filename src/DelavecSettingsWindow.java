@@ -1,7 +1,10 @@
 package src;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.io.File;
+import java.nio.file.Files;
 import java.util.Base64;
 import java.util.List;
 
@@ -37,6 +40,35 @@ public class DelavecSettingsWindow extends JFrame {
             imageLabel.setText("Slika ni na voljo");
         }
 
+        // Image selection button
+        JButton izberiSlikoBtn = new JButton("Izberi sliko");
+        JLabel izbranaPotLabel = new JLabel("Ni izbrane slike.");
+        final String[] base64Slika = {slikaBase64};  // Use current image as default
+
+        izberiSlikoBtn.addActionListener(ae -> {
+            JFileChooser fileChooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Slikovne datoteke", "jpg", "jpeg", "png", "gif");
+            fileChooser.setFileFilter(filter);
+
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                try {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    byte[] fileBytes = Files.readAllBytes(selectedFile.toPath());
+                    base64Slika[0] = Base64.getEncoder().encodeToString(fileBytes);
+
+                    // Show selected image in label
+                    ImageIcon icon = new ImageIcon(fileBytes);
+                    Image scaled = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                    imageLabel.setIcon(new ImageIcon(scaled));
+
+                    izbranaPotLabel.setText("Izbrana slika: " + selectedFile.getName());
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Napaka pri branju/shranjevanju slike.", "Napaka", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
         JTextField imeField = new JTextField(ime);
         JTextField priimekField = new JTextField(priimek);
         JTextField emsoField = new JTextField(currentEmso);
@@ -68,6 +100,8 @@ public class DelavecSettingsWindow extends JFrame {
         mainPanel.add(oddelekDropdown);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(imageLabel);
+        mainPanel.add(izberiSlikoBtn);
+        mainPanel.add(izbranaPotLabel);
 
         JButton updateButton = new JButton("Posodobi");
         updateButton.addActionListener(e -> {
@@ -77,8 +111,9 @@ public class DelavecSettingsWindow extends JFrame {
             String newTelefon = telefonField.getText();
             String oddelekIme = (String) oddelekDropdown.getSelectedItem();
 
+            // Update worker data with new image if selected
             Connection.updajtajDelavca(
-                    currentEmso, newEmso, newIme, newPriimek, newTelefon, slikaBase64, oddelekIme
+                    currentEmso, newEmso, newIme, newPriimek, newTelefon, base64Slika[0], oddelekIme
             );
 
             JOptionPane.showMessageDialog(this, "Delavec uspešno posodobljen!");
