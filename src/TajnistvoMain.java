@@ -88,6 +88,11 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
+        JButton krajiButton = new JButton("Kraji");
+        krajiButton.addActionListener(e -> new KrajiWindow(id));
+
+
+        panel.add(krajiButton);
         JButton logoutButton = new JButton("⏎ Nazaj / Odjava");
         logoutButton.addActionListener(e -> {
             dispose(); // Close current window
@@ -103,6 +108,7 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
         topPanel.add(logoutButton);
         topPanel.add(settingsButton);
         topPanel.add(refreshButton);
+        topPanel.add(krajiButton);
 
         getContentPane().add(topPanel, BorderLayout.NORTH);
     }

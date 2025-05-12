@@ -697,4 +697,53 @@ public class Connection {
         }
     }
 
+    public static void insertKraj(String kime, String kposta) {
+        String query = "SELECT insertajKraj(?, ?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, kime);
+            stmt.setString(2, kposta);
+
+            // Execute the insert
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void updateKraj(String ckposta, String nkrajime, String nkrajposta) {
+        String query = "SELECT updajtajKraj(?, ?, ?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, ckposta);
+            stmt.setString(2, nkrajime);
+            stmt.setString(3, nkrajposta);
+
+            // Execute the update
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteKraj(String kposta) {
+        String query = "SELECT deletajKraj(?)";
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, kposta);
+
+            // Execute the delete
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
