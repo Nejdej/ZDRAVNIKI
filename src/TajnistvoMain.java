@@ -3,7 +3,6 @@ package src;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -92,7 +91,7 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
         JButton logoutButton = new JButton("⏎ Nazaj / Odjava");
         logoutButton.addActionListener(e -> {
             dispose(); // Close current window
-            new startScreen().createAndShowGUI();
+            new StartScreen().createAndShowGUI();
         });
 
         JButton settingsButton = new JButton("⚙ Nastavitve");

@@ -3,10 +3,10 @@ package src;
 import javax.swing.*;
 import java.awt.*;
 
-public class startScreen {
+public class StartScreen {
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new startScreen().createAndShowGUI());
+        SwingUtilities.invokeLater(() -> new StartScreen().createAndShowGUI());
     }
 
     public void createAndShowGUI() {

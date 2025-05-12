@@ -3,80 +3,70 @@ package src;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 
 public class OddelekNaroci extends JFrame {
 
-    private JComboBox<Integer> dayBox, monthBox, yearBox;
-    private JSpinner timeSpinner;
-    private JTextArea opombeArea;
+    private final JComboBox<Integer> dayBox = new JComboBox<>();
+    private final JComboBox<Integer> monthBox = new JComboBox<>();
+    private final JComboBox<Integer> yearBox = new JComboBox<>();
+    private final JSpinner timeSpinner = new JSpinner(new SpinnerDateModel());
+    private final JTextArea opombeArea = new JTextArea(5, 30);
 
     public OddelekNaroci(int oddelekId) {
         setTitle("Naroči Pregled");
-        setSize(500, 350);
+        setSize(600, 300);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        // === Date Time Panel ===
-        JPanel dateTimePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // === Date & Time ===
+        JPanel dateTimePanel = new JPanel();
+        dateTimePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         dateTimePanel.add(new JLabel("Datum in ura:"));
 
-        dayBox = new JComboBox<>();
         for (int i = 1; i <= 31; i++) dayBox.addItem(i);
-        dateTimePanel.add(dayBox);
-        dateTimePanel.add(new JLabel("."));
-
-        monthBox = new JComboBox<>();
         for (int i = 1; i <= 12; i++) monthBox.addItem(i);
-        dateTimePanel.add(monthBox);
-        dateTimePanel.add(new JLabel("."));
-
-        yearBox = new JComboBox<>();
         int currentYear = LocalDate.now().getYear();
         for (int i = currentYear - 1; i <= currentYear + 5; i++) yearBox.addItem(i);
+
+        dateTimePanel.add(dayBox);
+        dateTimePanel.add(new JLabel("."));
+        dateTimePanel.add(monthBox);
+        dateTimePanel.add(new JLabel("."));
         dateTimePanel.add(yearBox);
         dateTimePanel.add(new JLabel(" ob "));
 
-        SpinnerDateModel timeModel = new SpinnerDateModel();
-        timeSpinner = new JSpinner(timeModel);
-        JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, "HH:mm");
-        timeSpinner.setEditor(timeEditor);
+        timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "HH:mm"));
         timeSpinner.setValue(new Date());
         dateTimePanel.add(timeSpinner);
 
-        // === Form Panel ===
-        JPanel form = new JPanel(new GridLayout(4, 2));
+        // === Opombe Field ===
+        JPanel opombePanel = new JPanel(new BorderLayout());
+        opombePanel.setBorder(BorderFactory.createTitledBorder("Opombe"));
+        opombeArea.setLineWrap(true);
+        opombeArea.setWrapStyleWord(true);
+        opombePanel.add(new JScrollPane(opombeArea), BorderLayout.CENTER);
 
-        form.add(new JLabel("Opombe:"));
-        opombeArea = new JTextArea();
-        form.add(new JScrollPane(opombeArea));
-
-        // === Button ===
-        JButton naroci = new JButton("Naroči");
-
-        naroci.addActionListener(e -> {
+        // === Naroči Button ===
+        JButton narociBtn = new JButton("Naroči");
+        narociBtn.addActionListener(e -> {
             try {
                 int day = (int) dayBox.getSelectedItem();
                 int month = (int) monthBox.getSelectedItem();
                 int year = (int) yearBox.getSelectedItem();
 
-                Date time = (Date) timeSpinner.getValue();
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(time);
-                int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                int minute = calendar.get(Calendar.MINUTE);
+                Calendar cal = Calendar.getInstance();
+                cal.setTime((Date) timeSpinner.getValue());
+                int hour = cal.get(Calendar.HOUR_OF_DAY);
+                int minute = cal.get(Calendar.MINUTE);
 
                 LocalDateTime dateTime = LocalDateTime.of(LocalDate.of(year, month, day), LocalTime.of(hour, minute));
                 Timestamp timestamp = Timestamp.valueOf(dateTime.withNano(0));
-
                 String opombe = opombeArea.getText().trim();
 
                 boolean success = Connection.pokreniPregledeZaOddelek(oddelekId, String.valueOf(year), timestamp, opombe);
-
                 if (success) {
                     JOptionPane.showMessageDialog(this, "Pregled uspešno naročen!");
                     dispose();
@@ -90,11 +80,12 @@ public class OddelekNaroci extends JFrame {
         });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.add(naroci);
+        buttonPanel.add(narociBtn);
 
         // === Layout ===
+        setLayout(new BorderLayout(10, 10));
         add(dateTimePanel, BorderLayout.NORTH);
-        add(form, BorderLayout.CENTER);
+        add(opombePanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
     }
 }

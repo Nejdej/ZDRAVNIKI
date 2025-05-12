@@ -104,7 +104,7 @@ public class TajnistvoSettings extends JFrame {
 
                 dispose();
                 parent.dispose();
-                SwingUtilities.invokeLater(() -> new startScreen().createAndShowGUI());
+                SwingUtilities.invokeLater(() -> new StartScreen().createAndShowGUI());
             }
         });
 

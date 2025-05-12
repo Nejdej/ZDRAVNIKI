@@ -5,7 +5,11 @@ import java.awt.*;
 
 public class ZdravnikSettings extends JFrame {
 
-    public ZdravnikSettings(String currentNaziv, String currentSifra, ZdravnikUpdateListener listener) {
+    private final JFrame parentFrame; // Reference to ZdravnikMain
+
+    public ZdravnikSettings(String currentNaziv, String currentSifra, ZdravnikUpdateListener listener, JFrame parentFrame) {
+        this.parentFrame = parentFrame;
+
         setTitle("Zdravnik Nastavitve");
         setSize(300, 250);
         setLocationRelativeTo(null);
@@ -34,7 +38,6 @@ public class ZdravnikSettings extends JFrame {
             JOptionPane.showMessageDialog(this, "Zdravnik uspešno posodobljen.");
             dispose();
 
-            // Notify Main Window
             if (listener != null) {
                 listener.onZdravnikUpdated(newNaziv, newSifra);
             }
@@ -46,8 +49,13 @@ public class ZdravnikSettings extends JFrame {
             if (confirm == JOptionPane.YES_OPTION) {
                 Connection.deleteZdravnik(currentSifra);
                 JOptionPane.showMessageDialog(this, "Zdravnik izbrisan.");
-                dispose();
-                System.exit(0); // or go back to login screen if you have one
+                this.dispose();
+                if (parentFrame != null) {
+                    parentFrame.dispose(); // Close ZdravnikMain
+                }
+                StartScreen screen = new StartScreen();
+                screen.createAndShowGUI();
+
             }
         });
 

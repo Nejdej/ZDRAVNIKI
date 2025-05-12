@@ -1,7 +1,5 @@
 package src;
 
-import src.Connection;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -49,6 +47,7 @@ public class ZdravnikMain extends JFrame {
 
         preglediTable = new JTable();
         JScrollPane preglediScrollPane = new JScrollPane(preglediTable);
+
 
         // Shared columns
         String[] columns = {"ID", "Datum", "Opombe", "EMŠO"};
@@ -118,16 +117,16 @@ public class ZdravnikMain extends JFrame {
         JButton settingsButton = new JButton("Settings");
         settingsButton.addActionListener(e -> {
             ZdravnikSettings settings = new ZdravnikSettings(ime, sifra, (newIme, newSifra) -> {
-                dispose();
+                dispose(); // Close this ZdravnikMain before opening updated one
                 new ZdravnikMain(newIme, newSifra);
-            });
+            }, this); // 👈 Pass this frame to settings window
             settings.setVisible(true);
         });
 
         JButton logoutButton = new JButton("⏎ Nazaj / Odjava");
         logoutButton.addActionListener(e -> {
             dispose();
-            new startScreen().createAndShowGUI();
+            new StartScreen().createAndShowGUI();
         });
 
         topPanel.add(logoutButton, BorderLayout.WEST);
