@@ -22,7 +22,7 @@ public class TajnistvoSettings extends JFrame {
         JTextField telefonField = new JTextField();
         JTextField tajnikCaField = new JTextField();
         JTextField naslovField = new JTextField();
-        JTextField passwordField = new JPasswordField();
+        JPasswordField passwordField = new JPasswordField();
         JComboBox<String> krajDropdown = new JComboBox<>();
         List<Object[]> kraji = Connection.getAllKraji();
 
@@ -45,6 +45,8 @@ public class TajnistvoSettings extends JFrame {
         panel.add(krajDropdown);
         panel.add(new JLabel("Geslo:"));
         panel.add(passwordField);
+
+        krajDropdown.setSelectedItem(null);
 
         JButton saveButton = new JButton("Shrani");
         panel.add(saveButton);
@@ -69,16 +71,40 @@ public class TajnistvoSettings extends JFrame {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String ime = imeField.getText();
-                String email = emailField.getText();
-                String telefon = telefonField.getText();
-                String glavniTajnik = tajnikCaField.getText();
-                String naslov = naslovField.getText();
+                String ime = imeField.getText().trim();
+                String email = emailField.getText().trim();
+                String telefon = telefonField.getText().trim();
+                String glavniTajnik = tajnikCaField.getText().trim();
+                String naslov = naslovField.getText().trim();
                 String selectedKraj = (String) krajDropdown.getSelectedItem();
-                String geslo =  passwordField.getText();
+                String geslo = new String(passwordField.getPassword()).trim();
 
-                if (ime == null || ime.trim().isEmpty()) {
+                if (ime.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Ime ne sme biti prazno!");
+                    return;
+                }
+                if (email.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Email ne sme biti prazen!");
+                    return;
+                }
+                if (telefon.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Telefon ne sme biti prazen!");
+                    return;
+                }
+                if (glavniTajnik.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Polje 'Tajnik/ca' ne sme biti prazno!");
+                    return;
+                }
+                if (naslov.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Naslov ne sme biti prazen!");
+                    return;
+                }
+                if (selectedKraj == null || selectedKraj.trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Kraj mora biti izbran!");
+                    return;
+                }
+                if (geslo.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Geslo ne sme biti prazno!");
                     return;
                 }
 
@@ -86,7 +112,6 @@ public class TajnistvoSettings extends JFrame {
 
                 Connection.updateTajnistvo(id, ime, email, telefon, glavniTajnik, naslov, posta, geslo);
 
-                // Tell listener to refresh
                 if (listener != null) {
                     listener.onTajnistvoUpdated();
                 }
@@ -94,7 +119,6 @@ public class TajnistvoSettings extends JFrame {
                 dispose();
             }
         });
-
         JButton deleteButton = new JButton("Izbriši");
         panel.add(deleteButton);
 

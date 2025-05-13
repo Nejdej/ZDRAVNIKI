@@ -40,10 +40,9 @@ public class DelavecSettingsWindow extends JFrame {
             imageLabel.setText("Slika ni na voljo");
         }
 
-        // Image selection button
         JButton izberiSlikoBtn = new JButton("Izberi sliko");
         JLabel izbranaPotLabel = new JLabel("Ni izbrane slike.");
-        final String[] base64Slika = {slikaBase64};  // Use current image as default
+        final String[] base64Slika = {slikaBase64};  // fallback to original image if no new selected
 
         izberiSlikoBtn.addActionListener(ae -> {
             JFileChooser fileChooser = new JFileChooser();
@@ -57,7 +56,6 @@ public class DelavecSettingsWindow extends JFrame {
                     byte[] fileBytes = Files.readAllBytes(selectedFile.toPath());
                     base64Slika[0] = Base64.getEncoder().encodeToString(fileBytes);
 
-                    // Show selected image in label
                     ImageIcon icon = new ImageIcon(fileBytes);
                     Image scaled = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
                     imageLabel.setIcon(new ImageIcon(scaled));
@@ -88,6 +86,7 @@ public class DelavecSettingsWindow extends JFrame {
             oddelekDropdown.setSelectedItem(selectedOddelekIme);
         }
 
+        // Add fields
         mainPanel.add(new JLabel("Ime:"));
         mainPanel.add(imeField);
         mainPanel.add(new JLabel("Priimek:"));
@@ -105,19 +104,29 @@ public class DelavecSettingsWindow extends JFrame {
 
         JButton updateButton = new JButton("Posodobi");
         updateButton.addActionListener(e -> {
-            String newIme = imeField.getText();
-            String newPriimek = priimekField.getText();
-            String newEmso = emsoField.getText();
-            String newTelefon = telefonField.getText();
+            String newIme = imeField.getText().trim();
+            String newPriimek = priimekField.getText().trim();
+            String newEmso = emsoField.getText().trim();
+            String newTelefon = telefonField.getText().trim();
             String oddelekIme = (String) oddelekDropdown.getSelectedItem();
 
-            // Update worker data with new image if selected
+            if (newIme.isEmpty() || newPriimek.isEmpty() || newEmso.isEmpty() || newTelefon.isEmpty() || oddelekIme == null) {
+                JOptionPane.showMessageDialog(this, "Vsa polja razen slike morajo biti izpolnjena.", "Napaka", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // EMŠO validation: exactly 13 digits
+            if (!newEmso.matches("\\d{13}")) {
+                JOptionPane.showMessageDialog(this, "EMŠO mora vsebovati točno 13 številk.", "Napaka", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             Connection.updajtajDelavca(
                     currentEmso, newEmso, newIme, newPriimek, newTelefon, base64Slika[0], oddelekIme
             );
 
             JOptionPane.showMessageDialog(this, "Delavec uspešno posodobljen!");
-            parent.refreshData();  // Refresh the DelavciMain instance
+            parent.refreshData();
             dispose();
         });
 
