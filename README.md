@@ -6,6 +6,187 @@ Znotraj tajništva je možna kreacija oddelkov v tajništvu, dodajanje delavcev 
 Na drugi strani omogoča zdravnikom vpogled v vse prihajajoče in pretekle preglede, spreminjanje le-teh in naročanje celotnih oddelkov ali delavcev na pregled.  
 Aplikacija je bila ustvarjena v Javi, z vizualnimi elementi in razporeditvijo v Swing. Podatkovno bazo gosti Aiven, strežniški podprogrami so bili napisani preko Datagripa.
 
+## DATABAZA DDL SKRIPTA
+
+  
+  
+    create table if not exists kraji  
+    (  
+    id serial  
+    constraint "PK\_kraji"  
+    primary key,  
+    ime varchar not null,  
+    posta varchar(4) not null  
+    constraint posta  
+    unique  
+    )  
+    with (autovacuum\_enabled = true);  
+      
+    alter table kraji  
+    owner to avnadmin;  
+      
+    create table if not exists tajnistva  
+    (  
+    id serial  
+    constraint "PK\_tajnistva"  
+    primary key,  
+    ime varchar(200) not null,  
+    email varchar(200) not null  
+    constraint emailuniq  
+    unique,  
+    telefon varchar(20) not null,  
+    glavnia\_tajnikca varchar(200) not null,  
+    naslov varchar(200) not null,  
+    kraj\_id integer not null  
+    constraint "Relationship1"  
+    references kraji,  
+    pass varchar not null  
+    )  
+    with (autovacuum\_enabled = true);  
+      
+    alter table tajnistva  
+    owner to avnadmin;  
+      
+    create index if not exists "IX\_Relationship1"  
+    on tajnistva (kraj\_id);  
+      
+    create table if not exists oddelki  
+    (  
+    id serial  
+    constraint "PK\_oddelki"  
+    primary key,  
+    ime varchar(200) not null,  
+    opis text,  
+    tajnistvo\_id integer  
+    references tajnistva  
+    )  
+    with (autovacuum\_enabled = true);  
+      
+    alter table oddelki  
+    owner to avnadmin;  
+      
+    create table if not exists delavci  
+    (  
+    id serial  
+    constraint "PK\_delavci"  
+    primary key,  
+    ime varchar(200) not null,  
+    priimek varchar(200) not null,  
+    emso varchar(13) not null  
+    constraint emsouniq  
+    unique,  
+    telefon varchar not null,  
+    slikica text,  
+    oddelek\_id integer not null  
+    references oddelki  
+    )  
+    with (autovacuum\_enabled = true);  
+      
+    alter table delavci  
+    owner to avnadmin;  
+      
+    create table if not exists pregledi  
+    (  
+    id varchar(50) not null  
+    constraint "PK\_pregledi"  
+    primary key  
+    constraint id  
+    unique,  
+    datum timestamp not null,  
+    opombe text,  
+    delavec\_id integer not null  
+    constraint "Relationship7"  
+    references delavci  
+    )  
+    with (autovacuum\_enabled = true);  
+      
+    alter table pregledi  
+    owner to avnadmin;  
+      
+    create index if not exists "IX\_Relationship7"  
+    on pregledi (delavec\_id);  
+      
+    create table if not exists zdravniki  
+    (  
+    sifra varchar not null  
+    constraint sifrauniq  
+    unique,  
+    naziv varchar not null  
+    );  
+      
+    alter table zdravniki  
+    owner to avnadmin;  
+      
+    create table if not exists pregledideleted  
+    (  
+    id varchar(50) not null,  
+    datum timestamp not null,  
+    opombe text,  
+    emso\_delavca varchar not null,  
+    ime varchar not null,  
+    priimek varchar not null  
+    );  
+      
+    alter table pregledideleted  
+    owner to avnadmin;  
+      
+    create table if not exists logdelavci  
+    (  
+    id integer,  
+    ime varchar(200),  
+    priimek varchar(200),  
+    emso varchar(13),  
+    telefon char(20),  
+    slikica text,  
+    oddelek\_id integer,  
+    datum\_spremembe timestamp not null,  
+    tip\_spremembe varchar not null  
+    );  
+      
+    alter table logdelavci  
+    owner to avnadmin;  
+    
+
+  
+### **kraji**
+
+Tabela kraji hrani osnovne informacije o krajih, ki jih uporabljajo druge entitete (kot npr. tajništva). Atributi so: id (glavni ključ), ime (ime kraja), posta (štirimestna poštna številka, unikatna).  
+Poštna številka je unikatna, kar omogoča iskanje ali filtriranje krajev brez podvajanja.
+
+### **tajnistva**
+
+Tabela tajnistva predstavlja administrativne enote (tajništva), ki imajo svoje kontakte in pripadajo določenemu kraju. Atributi vključujejo: id, ime, email (unikaten), telefon, glavnia\_tajnikca, naslov, kraj\_id (tuj ključ na kraji), in pass. Tabela omogoča povezavo z lokacijo preko kraj\_id, medtem ko email služi kot unikaten identifikator za prijave.  
+
+### **oddelki**
+
+Tabela oddelki opisuje posamezne oddelke, ki delujejo pod tajništvi. Atributi so: id, ime, opis, in tajnistvo\_id, ki povezuje oddelek z nadrejenim tajništvom. Ta struktura omogoča hierarhično organizacijo administrativnih enot znotraj sistema.
+
+  
+### **delavci**
+
+Tabela delavci hrani osebne podatke zaposlenih, ki so razporejeni v oddelke. Atributi vključujejo: id, ime, priimek, emso (unikaten), telefon, slikica, oddelek\_id. Povezava z oddelki omogoča filtriranje delavcev glede na njihovo pripadnost, EMŠO pa služi kot glavni osebni identifikator.
+
+  
+### **pregledi**
+
+Tabela pregledi beleži posamezne preglede delavcev. Atributi so: id (unikaten in primarni), datum, opombe, delavec\_id (tuj ključ na delavci). Omogoča zgodovinsko sledenje zdravniškim pregledom vsakega delavca.
+
+  
+### **zdravniki**
+
+Tabela zdravniki hrani osnovne informacije o zdravnikih, ki opravljajo preglede. Atributa sta: sifra (unikaten identifikator) in naziv. Čeprav trenutno tabela ni povezana z drugimi, omogoča širitev funkcionalnosti (npr. povezovanje pregledov z zdravniki).
+
+  
+### **pregledideleted**
+
+Tabela beleži arhivirane (izbrisane) zapise pregledov, skupaj z osebnimi podatki delavca. Atributi: id, datum, opombe, emso\_delavca, ime, priimek. Služi kot varnostna kopija za sledljivost in audit izbrisanih zapisov.
+
+  
+### **logdelavci**
+
+Tabela logdelavci omogoča sledenje spremembam v tabeli delavci. Atributi: vsi podatki delavca + datum\_spremembe in tip\_spremembe (npr. vstavljanje, brisanje). Uporablja se za revizijo, preverjanje sprememb in obnovo izgubljenih podatkov.
+
+  
 ## **POSTGRESQL strežniški podprogrami**
 
 ### ZDRAVNIKI:
