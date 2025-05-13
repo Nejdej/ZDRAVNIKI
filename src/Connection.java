@@ -776,4 +776,29 @@ public class Connection {
             throw new RuntimeException("Error encrypting password", e);
         }
     }
+
+    public static List<Object[]> getAllLogEntries() {
+        List<Object[]> logEntries = new ArrayList<>();
+        String query = "SELECT * FROM prikaziLOG()"; // Calling the function
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Object[] row = new Object[7]; // We have 7 columns in the result
+                row[0] = rs.getString("iime");       // Name
+                row[1] = rs.getString("ppriimek");   // Surname
+                row[2] = rs.getString("eemso");      // EMŠO
+                row[3] = rs.getString("ttelefon");   // Phone
+                row[4] = rs.getInt("ooddelek_id");   // Department ID
+                row[5] = rs.getTimestamp("ddatum_spremembe"); // Change Timestamp
+                row[6] = rs.getString("ttip_spremembe"); // Change Type
+                logEntries.add(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return logEntries;
+    }
 }

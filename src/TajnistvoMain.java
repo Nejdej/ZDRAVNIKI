@@ -105,10 +105,14 @@ public class TajnistvoMain extends JFrame implements TajnistvoUpdateListener {
         JButton refreshButton = new JButton("Osveži");
         refreshButton.addActionListener(e -> refreshTable());
 
+        JButton LOGbutton = new JButton("LOGS");
+        LOGbutton.addActionListener(e -> new LOGPrikaz());
+
         topPanel.add(logoutButton);
         topPanel.add(settingsButton);
         topPanel.add(refreshButton);
         topPanel.add(krajiButton);
+        topPanel.add(LOGbutton);
 
         getContentPane().add(topPanel, BorderLayout.NORTH);
     }
