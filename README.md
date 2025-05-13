@@ -6,148 +6,145 @@ Znotraj tajništva je možna kreacija oddelkov v tajništvu, dodajanje delavcev 
 Na drugi strani omogoča zdravnikom vpogled v vse prihajajoče in pretekle preglede, spreminjanje le-teh in naročanje celotnih oddelkov ali delavcev na pregled.  
 Aplikacija je bila ustvarjena v Javi, z vizualnimi elementi in razporeditvijo v Swing. Podatkovno bazo gosti Aiven, strežniški podprogrami so bili napisani preko Datagripa.
 
-## DATABAZA DDL SKRIPTA (Screenshot DATABAZE.png)
-
-  
-  
-    create table if not exists kraji  
-    (  
-    id serial  
-    constraint "PK\_kraji"  
-    primary key,  
-    ime varchar not null,  
-    posta varchar(4) not null  
-    constraint posta  
-    unique  
-    )  
-    with (autovacuum\_enabled = true);  
-      
-    alter table kraji  
-    owner to avnadmin;  
-      
-    create table if not exists tajnistva  
-    (  
-    id serial  
-    constraint "PK\_tajnistva"  
-    primary key,  
-    ime varchar(200) not null,  
-    email varchar(200) not null  
-    constraint emailuniq  
-    unique,  
-    telefon varchar(20) not null,  
-    glavnia\_tajnikca varchar(200) not null,  
-    naslov varchar(200) not null,  
-    kraj\_id integer not null  
-    constraint "Relationship1"  
-    references kraji,  
-    pass varchar not null  
-    )  
-    with (autovacuum\_enabled = true);  
-      
-    alter table tajnistva  
-    owner to avnadmin;  
-      
-    create index if not exists "IX\_Relationship1"  
-    on tajnistva (kraj\_id);  
-      
-    create table if not exists oddelki  
-    (  
-    id serial  
-    constraint "PK\_oddelki"  
-    primary key,  
-    ime varchar(200) not null,  
-    opis text,  
-    tajnistvo\_id integer  
-    references tajnistva  
-    )  
-    with (autovacuum\_enabled = true);  
-      
-    alter table oddelki  
-    owner to avnadmin;  
-      
-    create table if not exists delavci  
-    (  
-    id serial  
-    constraint "PK\_delavci"  
-    primary key,  
-    ime varchar(200) not null,  
-    priimek varchar(200) not null,  
-    emso varchar(13) not null  
-    constraint emsouniq  
-    unique,  
-    telefon varchar not null,  
-    slikica text,  
-    oddelek\_id integer not null  
-    references oddelki  
-    )  
-    with (autovacuum\_enabled = true);  
-      
-    alter table delavci  
-    owner to avnadmin;  
-      
-    create table if not exists pregledi  
-    (  
-    id varchar(50) not null  
-    constraint "PK\_pregledi"  
-    primary key  
-    constraint id  
-    unique,  
-    datum timestamp not null,  
-    opombe text,  
-    delavec\_id integer not null  
-    constraint "Relationship7"  
-    references delavci  
-    )  
-    with (autovacuum\_enabled = true);  
-      
-    alter table pregledi  
-    owner to avnadmin;  
-      
-    create index if not exists "IX\_Relationship7"  
-    on pregledi (delavec\_id);  
-      
-    create table if not exists zdravniki  
-    (  
-    sifra varchar not null  
-    constraint sifrauniq  
-    unique,  
-    naziv varchar not null  
-    );  
-      
-    alter table zdravniki  
-    owner to avnadmin;  
-      
-    create table if not exists pregledideleted  
-    (  
-    id varchar(50) not null,  
-    datum timestamp not null,  
-    opombe text,  
-    emso\_delavca varchar not null,  
-    ime varchar not null,  
-    priimek varchar not null  
-    );  
-      
-    alter table pregledideleted  
-    owner to avnadmin;  
-      
-    create table if not exists logdelavci  
-    (  
-    id integer,  
-    ime varchar(200),  
-    priimek varchar(200),  
-    emso varchar(13),  
-    telefon char(20),  
-    slikica text,  
-    oddelek\_id integer,  
-    datum\_spremembe timestamp not null,  
-    tip\_spremembe varchar not null  
-    );  
-      
-    alter table logdelavci  
-    owner to avnadmin;  
+## DATABAZA DDL SKRIPTA (Screenshot DATABAZE.png) 
     
+    `create table if not exists kraji    
+    (    
+    id serial    
+    constraint "PK\_kraji"    
+    primary key,    
+    ime varchar not null,    
+    posta varchar(4) not null    
+    constraint posta    
+    unique    
+    )    
+    with (autovacuum\_enabled = true);    
+      
+    alter table kraji    
+    owner to avnadmin;    
+      
+    create table if not exists tajnistva    
+    (    
+    id serial    
+    constraint "PK\_tajnistva"    
+    primary key,    
+    ime varchar(200) not null,    
+    email varchar(200) not null    
+    constraint emailuniq    
+    unique,    
+    telefon varchar(20) not null,    
+    glavnia\_tajnikca varchar(200) not null,    
+    naslov varchar(200) not null,    
+    kraj\_id integer not null    
+    constraint "Relationship1"    
+    references kraji,    
+    pass varchar not null    
+    )    
+    with (autovacuum\_enabled = true);    
+      
+    alter table tajnistva    
+    owner to avnadmin;    
+      
+    create index if not exists "IX\_Relationship1"    
+    on tajnistva (kraj\_id);    
+      
+    create table if not exists oddelki    
+    (    
+    id serial    
+    constraint "PK\_oddelki"    
+    primary key,    
+    ime varchar(200) not null,    
+    opis text,    
+    tajnistvo\_id integer    
+    references tajnistva    
+    )    
+    with (autovacuum\_enabled = true);    
+      
+    alter table oddelki    
+    owner to avnadmin;    
+      
+    create table if not exists delavci    
+    (    
+    id serial    
+    constraint "PK\_delavci"    
+    primary key,    
+    ime varchar(200) not null,    
+    priimek varchar(200) not null,    
+    emso varchar(13) not null    
+    constraint emsouniq    
+    unique,    
+    telefon varchar not null,    
+    slikica text,    
+    oddelek\_id integer not null    
+    references oddelki    
+    )    
+    with (autovacuum\_enabled = true);    
+      
+    alter table delavci    
+    owner to avnadmin;    
+      
+    create table if not exists pregledi    
+    (    
+    id varchar(50) not null    
+    constraint "PK\_pregledi"    
+    primary key    
+    constraint id    
+    unique,    
+    datum timestamp not null,    
+    opombe text,    
+    delavec\_id integer not null    
+    constraint "Relationship7"    
+    references delavci    
+    )    
+    with (autovacuum\_enabled = true);    
+      
+    alter table pregledi    
+    owner to avnadmin;    
+      
+    create index if not exists "IX\_Relationship7"    
+    on pregledi (delavec\_id);    
+      
+    create table if not exists zdravniki    
+    (    
+    sifra varchar not null    
+    constraint sifrauniq    
+    unique,    
+    naziv varchar not null    
+    );    
+      
+    alter table zdravniki    
+    owner to avnadmin;    
+      
+    create table if not exists pregledideleted    
+    (    
+    id varchar(50) not null,    
+    datum timestamp not null,    
+    opombe text,    
+    emso\_delavca varchar not null,    
+    ime varchar not null,    
+    priimek varchar not null    
+    );    
+      
+    alter table pregledideleted    
+    owner to avnadmin;    
+      
+    create table if not exists logdelavci    
+    (    
+    id integer,    
+    ime varchar(200),    
+    priimek varchar(200),    
+    emso varchar(13),    
+    telefon char(20),    
+    slikica text,    
+    oddelek\_id integer,    
+    datum\_spremembe timestamp not null,    
+    tip\_spremembe varchar not null    
+    );    
+      
+    alter table logdelavci    
+    owner to avnadmin;    
+    `
 
-  
 ### **kraji**
 
 Tabela kraji hrani osnovne informacije o krajih, ki jih uporabljajo druge entitete (kot npr. tajništva). Atributi so: id (glavni ključ), ime (ime kraja), posta (štirimestna poštna številka, unikatna).  
@@ -155,38 +152,32 @@ Poštna številka je unikatna, kar omogoča iskanje ali filtriranje krajev brez 
 
 ### **tajnistva**
 
-Tabela tajnistva predstavlja administrativne enote (tajništva), ki imajo svoje kontakte in pripadajo določenemu kraju. Atributi vključujejo: id, ime, email (unikaten), telefon, glavnia\_tajnikca, naslov, kraj\_id (tuj ključ na kraji), in pass. Tabela omogoča povezavo z lokacijo preko kraj\_id, medtem ko email služi kot unikaten identifikator za prijave.  
+Tabela tajnistva predstavlja administrativne enote (tajništva), ki imajo svoje kontakte in pripadajo določenemu kraju. Atributi vključujejo: id, ime, email (unikaten), telefon, glavnia\_tajnikca, naslov, kraj\_id (tuj ključ na kraji), in pass. Tabela omogoča povezavo z lokacijo preko kraj\_id, medtem ko email služi kot unikaten identifikator za prijave. 
 
 ### **oddelki**
 
 Tabela oddelki opisuje posamezne oddelke, ki delujejo pod tajništvi. Atributi so: id, ime, opis, in tajnistvo\_id, ki povezuje oddelek z nadrejenim tajništvom. Ta struktura omogoča hierarhično organizacijo administrativnih enot znotraj sistema.
 
-  
 ### **delavci**
 
 Tabela delavci hrani osebne podatke zaposlenih, ki so razporejeni v oddelke. Atributi vključujejo: id, ime, priimek, emso (unikaten), telefon, slikica, oddelek\_id. Povezava z oddelki omogoča filtriranje delavcev glede na njihovo pripadnost, EMŠO pa služi kot glavni osebni identifikator.
 
-  
 ### **pregledi**
 
 Tabela pregledi beleži posamezne preglede delavcev. Atributi so: id (unikaten in primarni), datum, opombe, delavec\_id (tuj ključ na delavci). Omogoča zgodovinsko sledenje zdravniškim pregledom vsakega delavca.
 
-  
 ### **zdravniki**
 
 Tabela zdravniki hrani osnovne informacije o zdravnikih, ki opravljajo preglede. Atributa sta: sifra (unikaten identifikator) in naziv. Čeprav trenutno tabela ni povezana z drugimi, omogoča širitev funkcionalnosti (npr. povezovanje pregledov z zdravniki).
 
-  
 ### **pregledideleted**
 
 Tabela beleži arhivirane (izbrisane) zapise pregledov, skupaj z osebnimi podatki delavca. Atributi: id, datum, opombe, emso\_delavca, ime, priimek. Služi kot varnostna kopija za sledljivost in audit izbrisanih zapisov.
 
-  
 ### **logdelavci**
 
 Tabela logdelavci omogoča sledenje spremembam v tabeli delavci. Atributi: vsi podatki delavca + datum\_spremembe in tip\_spremembe (npr. vstavljanje, brisanje). Uporablja se za revizijo, preverjanje sprememb in obnovo izgubljenih podatkov.
 
-  
 ## **POSTGRESQL strežniški podprogrami**
 
 ### ZDRAVNIKI:
@@ -208,7 +199,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **insertajZdravnika** / Vstavi novega zdravnika z nazivom in šifro, če ta šifra še ne obstaja in če patronska šifra obstaja. V nasprotnem primeru vrne ustrezno napako.
 
 CREATE OR REPLACE FUNCTION insertajZdravnika(patronsifra VARCHAR, ssifra VARCHAR, nnaziv VARCHAR)  
@@ -229,7 +219,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **updajtajZdravnika** / Posodobi naziv in šifro obstoječega zdravnika, če se ujemata s starimi vrednostmi.
 
 CREATE OR REPLACE FUNCTION updajtajZdravnika(csifra VARCHAR, nsifra VARCHAR, cnaziv VARCHAR, nnaziv VARCHAR)  
@@ -243,7 +232,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **deletajZdravnika** / Izbriše zdravnika iz baze glede na podano šifro. 
 
 CREATE OR REPLACE FUNCTION deletajZdravnika(csifra VARCHAR)  
@@ -256,7 +244,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 ### TAJNISTVA
 
 **checkTajnistvoCredentials** / Preveri, ali kombinacija e-pošte in gesla v tabeli tajništva obstaja, ter če obstaja, vrne osnovne podatke tajništva. Če ne obstaja, vrne -1 in dve 'FALSE' vrednosti.
@@ -276,6 +263,44 @@ $$
 LANGUAGE plpgsql;
 
   
+  
+**resetPassword / **Funkcija omogoča posodobitev gesla uporabniku na podlagi njegovega e-poštnega naslova. Če je e-poštni naslov prisoten v tabeli tajnistva, se geslo posodobi na novo vrednost, sicer funkcija vrne obvestilo, da e-poštni naslov ni povezan z nobenim tajništvom.
+
+CREATE OR REPLACE FUNCTION resetPassword(temail varchar, npassword varchar)
+
+RETURNS varchar AS
+
+$$
+
+DECLARE
+
+BEGIN
+
+if(temail in (SELECT email FROM tajnistva))
+
+THEN
+
+UPDATE tajnistva
+
+SET pass = npassword
+
+WHERE email = temail;
+
+RETURN 'Uspešno posodobljeno';
+
+ELSE
+
+RETURN 'Ta email račun ni povezan z nobenim tajništvom';
+
+end if;
+
+END;
+
+$$
+
+LANGUAGE plpgsql;
+
+  
 **insertajTajnistvo** / Vstavi novo tajništvo v bazo. Poštno številko pretvori v kraj\_id preko povezave s tabelo kraji.
 
 CREATE OR REPLACE FUNCTION insertajTajnistvo (ttime varchar, temail varchar, ttelefon varchar, tglavnia\_tajnikca varchar, tnaslov varchar, tposta varchar, tpass varchar)  
@@ -289,7 +314,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **updajtajTajnistvo**: Posodobi podatke obstoječega tajništva glede na ID. Vključno s kraj\_id, ki ga poišče glede na vneseno poštno številko.
 
 CREATE OR REPLACE FUNCTION updajtajTajnistvo (tid int, ttime varchar, temail varchar, ttelefon varchar, tglavnia\_tajnikca varchar, tnaslov varchar, tposta varchar, tgeslo varchar )  
@@ -305,9 +329,7 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
-  
-**deletajTajnistvoTrigger: **Preden izbrišeš tajništvo, izbriše vse delavce in oddelke povezane s tem tajništvom. Funkcija se sproži avtomatsko prek sprožilca (triggerja).
+\*\*deletajTajnistvoTrigger: \*\*Preden izbrišeš tajništvo, izbriše vse delavce in oddelke povezane s tem tajništvom. Funkcija se sproži avtomatsko prek sprožilca (triggerja).
 
 CREATE OR REPLACE FUNCTION deletajTajnistvoTrigger()  
 RETURNS TRIGGER AS  
@@ -331,7 +353,6 @@ BEFORE DELETE ON tajnistva
 FOR EACH ROW  
 EXECUTE FUNCTION deletajTajnistvoTrigger();
 
-  
 **deletajTajnistvo**: Izbriše tajništvo glede na ID. Sproži se tudi trigger, ki poskrbi, da se odstranijo povezani podatki.
 
 CREATE OR REPLACE FUNCTION deletajTajnistvo(tid int)  
@@ -345,7 +366,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **prikaziTajnistva**: Vrne vse tajništva skupaj s pripadajočimi podatki iz tabele kraji. Vsaka vrstica vsebuje ime, e-pošto, telefon, naslov, vodjo in kraj.
 
 CREATE OR REPLACE FUNCTION prikaziTajnistva ()  
@@ -370,7 +390,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **prikaziTajnistvo**: Vrne eno specifično tajništvo glede na ID, z dodatnim prikazom gesla. 
 
 CREATE OR REPLACE FUNCTION prikaziTajnistvo(tid int)
@@ -398,7 +417,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 ### KRAJI
 
 **insertajKraj** / Funkcija vstavi nov kraj v tabelo kraji, tako da ji podamo ime in poštno številko. 
@@ -414,7 +432,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **updajtajKraj** / Funkcija posodobi ime in poštno številko kraja, ki ima dano začetno poštno številko. Uporablja se za spremembo obstoječih podatkov v tabeli kraji.
 
 CREATE OR REPLACE FUNCTION updajtajKraj (ckposta varchar, nkrajime varchar, nkrajposta varchar)  
@@ -429,7 +446,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **deletajKrajTrigger** / Funkcija znotraj sprožilca (triggerja), ki ob brisanju kraja posodobi vse povezane vrstice v tajnistva na nadomestni kraj s poštno številko ‘0001’. Tako se prepreči prekinitvam povezav med tabelami.
 
 CREATE OR REPLACE FUNCTION deletajKrajTrigger ()  
@@ -445,7 +461,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **deletajKraj** / Funkcija izbriše kraj iz tabele kraji na podlagi poštne številke. Če obstaja sprožilec, se ob tem izvede tudi posodobitev povezanih tabel.
 
 CREATE OR REPLACE FUNCTION deletajKraj (kposta varchar)
@@ -460,7 +475,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **prikaziKraje** / Funkcija vrne vse vrstice iz tabele kraji, vključno z ID-jem, imenom in poštno številko. Namenjena je prikazu vseh obstoječih krajev.
 
 CREATE OR REPLACE FUNCTION prikaziKraje ()  
@@ -479,7 +493,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **prikaziKraj** / Funkcija poišče kraj glede na poštno številko in vrne njegove podatke. Rezultat vsebuje ID, ime in poštno številko izbrane vrstice.
 
 CREATE OR REPLACE FUNCTION prikaziKraj (kposta varchar)  
@@ -499,10 +512,8 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 ### ODDELKI
 
-  
 **insertajOddelek** / Funkcija vstavi nov oddelek z imenom, opisom in imenom tajništva, ki mu pripada. Tajnistvo se določi prek poizvedbe po njegovem imenu.
 
 CREATE OR REPLACE FUNCTION insertajOddelek(oime varchar, oopis varchar, tiime varchar)  
@@ -516,7 +527,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **updajtajOddelek** / Funkcija posodobi ime, opis in pripadajoče tajništvo oddelka glede na njegov ID. Tajnistvo se znova določi preko imena.
 
 CREATE OR REPLACE FUNCTION updajtajOddelek(oid int, oime varchar, oopis varchar, tiime varchar)  
@@ -531,7 +541,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **deletajOddelekTrigger** / Funkcija v sprožilcu izbriše vse delavce, ki pripadajo oddelku, tik preden je ta izbrisan. Tako se ohrani podatkovna integriteta brez “osirotelih” delavce
 
 CREATE OR REPLACE FUNCTION deletajOddelekTrigger()  
@@ -544,7 +553,6 @@ RETURN OLD;
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **deletajOddelek** / Funkcija izbriše obstoječi oddelek iz baze na podlagi njegovega ID-ja. 
 
 CREATE OR REPLACE FUNCTION deletajOddelek(oid int)  
@@ -558,7 +566,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **prikaziOddelke** / Funkcija vrne seznam vseh oddelkov, vključno z njihovim opisom in imenom tajništva. Združuje podatke iz tabele oddelki in tajnistva.
 
 CREATE OR REPLACE FUNCTION prikaziOddelke()  
@@ -579,7 +586,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **prikaziOddelek** / Funkcija prikaže en specifičen oddelek na podlagi njegovega ID-ja. Vrne tudi ime pripadajočega tajništva.
 
 CREATE OR REPLACE FUNCTION prikaziOddelek(oid int)  
@@ -601,8 +607,8 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-**  
-**
+\*\*  
+\*\*
 
 **prikaziOddelkeVTajnistvu** / Funkcija prikaže vse oddelke, ki pripadajo določenemu tajništvu (glede na ID). 
 
@@ -625,7 +631,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **oddelekcelpregled** / Za vse delavce določenega oddelka ustvari nov pregled s podanimi podatki. / Funkcija pridobi vse EMSO številke delavcev iz oddelka oid in za vsakega posamezno pokliče funkcijo insertajPregled z letnico pregleda, datumom in opombo.
 
 CREATE OR REPLACE FUNCTION oddelekcelpregled(oid INTEGER, pidleto VARCHAR, pdatum TIMESTAMP, popombe TEXT)
@@ -656,7 +661,6 @@ $$
 
 LANGUAGE plpgsql
 
-  
 ### DELAVCI
 
 **insertajDelavca** / Vstavi novega delavca v tabelo delavci glede na podani oddelek (ime). 
@@ -672,7 +676,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **updajtajDelavca** / Posodobi obstoječega delavca glede na emso; spremeni lahko ime, priimek, telefon, sliko, in povezan oddelek.
 
 CREATE OR REPLACE FUNCTION updajtajDelavca (cdemso varchar, ndemso varchar, ndime varchar, ndpriimek varchar, ndtelefon varchar, ndslikica text, doddelek varchar)  
@@ -687,7 +690,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **log\_pregledi\_before\_delavec\_delete** / Pred izbrisom delavca shrani povezane preglede v arhivsko tabelo pregledideleted in izbriše te preglede iz pregledi. Uporablja se v sprožilcu (triggerju), ki deluje pred brisanjem.
 
 CREATE OR REPLACE FUNCTION log\_pregledi\_before\_delavec\_delete()  
@@ -719,7 +721,62 @@ END;
 $$ LANGUAGE plpgsql;
 
   
-**log\_changes\_to\_logdelavci() / **prožilna funkcija (trigger ), ki beleži vse spremembe (vstavljanja, posodobitve, izbrise) v tabeli delavci v namensko dnevniško tabelo logdelavci.
+**prikaziLOG/ **Vrača vse zapise iz tabele logdelavci, vključno z imenom, priimkom, EMŠO, telefonsko številko, ID-jem oddelka, datumom spremembe in tipom spremembe. Namenjena je pridobivanju zgodovine sprememb za vse zaposlene v organizaciji, shranjene v tabeli logdelavci.
+
+CREATE OR REPLACE FUNCTION prikaziLOG()
+
+RETURNS TABLE
+
+(
+
+iime VARCHAR,
+
+ppriimek VARCHAR,
+
+eemso VARCHAR,
+
+ttelefon VARCHAR,
+
+ooddelek\_id INTEGER,
+
+ddatum\_spremembe TIMESTAMP,
+
+ttip\_spremembe VARCHAR
+
+) AS
+
+$$
+
+BEGIN
+
+RETURN QUERY
+
+SELECT
+
+ime,
+
+priimek,
+
+emso,
+
+telefon,
+
+oddelek\_id,
+
+datum\_spremembe,
+
+tip\_spremembe
+
+FROM logdelavci;
+
+END;
+
+$$
+
+LANGUAGE plpgsql;
+
+  
+\*\***log\_changes\_to\_logdelavci**() / \*\*prožilna funkcija (trigger ), ki beleži vse spremembe (vstavljanja, posodobitve, izbrise) v tabeli delavci v namensko dnevniško tabelo logdelavci.
 
 CREATE OR REPLACE FUNCTION log\_changes\_to\_logdelavci()  
 RETURNS TRIGGER AS $$  
@@ -762,7 +819,6 @@ RETURN NULL;
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **deletajDelavca** / Izbriše delavca iz tabele delavci glede na njegov emso.
 
 CREATE OR REPLACE FUNCTION prikaziDelavce()  
@@ -789,7 +845,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **prikaziDelavce** / Prikaže vse delavce skupaj z njihovimi pripadajočimi oddelki, tajništvi in kraji. Vrnjen je tabelaričen rezultat z več informacijami.
 
 CREATE OR REPLACE FUNCTION prikaziDelavce()  
@@ -816,7 +871,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **prikaziDelavca** / Prikaže enega samega delavca glede na emso, skupaj z vsemi pripadajočimi informacijami iz povezanih tabel.
 
 CREATE OR REPLACE FUNCTION prikaziDelavca(demso varchar)  
@@ -844,7 +898,6 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 **prikaziDelavceVoddelku** / Prikaže vse delavce znotraj določenega oddelka na podlagi id oddelka. Tudi tukaj se prikažejo vse povezane informacije o tajništvu in kraju.
 
 CREATE OR REPLACE FUNCTION prikaziDelavceVoddelku(oid int)  
@@ -872,10 +925,8 @@ END;
 $$  
 LANGUAGE plpgsql;
 
-  
 ### PREGLEDI
 
-  
 **insertajPregled** / Vstavi nov pregled z edinstvenim ID-jem v tabelo pregledi. ID se ustvari naključno in je sestavljen iz leta ter 13 znakov.
 
 CREATE OR REPLACE FUNCTION insertajPregled(pidleto VARCHAR, pdatum TIMESTAMP, popombe TEXT, demso VARCHAR)  
@@ -904,7 +955,6 @@ VALUES (new\_id, pdatum, popombe, (SELECT id FROM delavci WHERE emso = demso));
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **updajtajPregled** / Posodobi obstoječi pregled v tabeli pregledi glede na njegov ID. Posodobijo se podatki o ID-ju, datumu, opombah in pripadajočem delavcu.
 
 CREATE OR REPLACE FUNCTION updajtajPregled(pid varchar, npid varchar, pdatum timestamp, popombe text, demso varchar)  
@@ -916,9 +966,8 @@ UPDATE pregledi
 SET id = npid, datum = pdatum, opombe = popombe, delavec\_id = (SELECT id FROM delavci WHERE emso = demso)  
 WHERE id = pid;  
 END;  
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql; 
 
-  
 ### 
 
 **updajtajPregledDeleted** / Posodobi pregled v arhivski tabeli pregledideleted. Dodaš ali spremeniš osnovne podatke ter osebne podatke delavca.
@@ -934,7 +983,6 @@ WHERE id = pid;
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **deletajPregled** / Izbriše pregled iz pregledi ali pregledideleted, če ta obstaja. Preveri, v kateri tabeli je ID in ga odstrani.
 
 CREATE OR REPLACE FUNCTION deletajPregled(pid varchar)  
@@ -951,7 +999,6 @@ END IF;
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **prikaziPreglede** / Prikaže vse aktivne preglede z osnovnimi podatki in EMŠO pripadajočega delavca. Združuje tabeli pregledi in delavci.
 
 CREATE OR REPLACE FUNCTION prikaziPreglede()  
@@ -965,7 +1012,6 @@ FROM pregledi p INNER JOIN delavci d ON d.id = p.delavec\_id;
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **prikaziPregledeDeleted** / Prikaže vse izbrisane preglede s podatki o delavcu. Rezultati prihajajo iz arhivske tabele pregledideleted.
 
 CREATE OR REPLACE FUNCTION prikaziPregledeDeleted()  
@@ -978,7 +1024,6 @@ SELECT \* FROM pregledideleted;
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **prikaziPregled** / Prikaže določen pregled iz pregledi glede na njegov ID. Vrne osnovne podatke in EMŠO delavca.
 
 CREATE OR REPLACE FUNCTION prikaziPregled(pid varchar)  
@@ -993,7 +1038,6 @@ WHERE p.id = pid;
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **prikaziPregledDeleted** / Prikaže določen izbrisani pregled iz pregledideleted. Vrne tudi ime in priimek delavca.
 
 CREATE OR REPLACE FUNCTION prikaziPregledDeleted(pid varchar)  
@@ -1006,7 +1050,6 @@ SELECT \* FROM pregledideleted WHERE id = pid;
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **prikaziPregledDelavca** / Prikaže vse preglede, ki jih je opravil določen delavec (glede na EMŠO). Združi pregledi in delavci.
 
 CREATE OR REPLACE FUNCTION prikaziPregledDelavca(demso varchar)  
@@ -1021,7 +1064,6 @@ WHERE d.emso = demso;
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **prikaziPregledDeletedDelavca** / Prikaže vse izbrisane preglede določenega delavca. Iskanje temelji na EMŠO.
 
 CREATE OR REPLACE FUNCTION prikaziPregledDeletedDelavca(demso varchar)  
@@ -1034,7 +1076,6 @@ SELECT \* FROM pregledideleted WHERE emso\_delavca = demso;
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **prikaziPregledOddelka** / Prikaže preglede, na katere so prijavljeni delavci določenega oddelka. Združuje pregledi, delavci in oddelki.
 
 CREATE OR REPLACE FUNCTION prikaziPregledOddelka(oid int)  
@@ -1050,7 +1091,6 @@ WHERE o.id = oid;
 END;  
 $$ LANGUAGE plpgsql;
 
-  
 **prikaziPregledTajnistva** / Prikaže preglede znotraj določenega tajništva. Funkcija povezuje pregledi, delavci, oddelki in tajnistva.
 
 CREATE OR REPLACE FUNCTION prikaziPregledTajnistva(tid int)  
@@ -1065,20 +1105,8 @@ INNER JOIN oddelki o ON o.id = d.oddelek\_id
 INNER JOIN tajnistva t ON t.id = o.tajnistvo\_id  
 WHERE t.id = tid;  
 END;  
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql; 
 
-  
-  
-  
-###   
+### 
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
 ### **.** 
