@@ -6,7 +6,7 @@ Znotraj tajništva je možna kreacija oddelkov v tajništvu, dodajanje delavcev 
 Na drugi strani omogoča zdravnikom vpogled v vse prihajajoče in pretekle preglede, spreminjanje le-teh in naročanje celotnih oddelkov ali delavcev na pregled.  
 Aplikacija je bila ustvarjena v Javi, z vizualnimi elementi in razporeditvijo v Swing. Podatkovno bazo gosti Aiven, strežniški podprogrami so bili napisani preko Datagripa.
 
-## DATABAZA DDL SKRIPTA
+## DATABAZA DDL SKRIPTA (Screenshot DATABAZE.png)
 
   
   
