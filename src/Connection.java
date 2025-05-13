@@ -1,8 +1,12 @@
 package src;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.swing.*;
+import java.security.spec.KeySpec;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class Connection {
@@ -24,12 +28,13 @@ public class Connection {
 
     public static String checkZdravnikSifra(String sifra) {
         String result = null;
+        String encrypted = encryptPassword(sifra);
         String query = "SELECT * FROM checkZdravnikSifra(?)";
 
         try (java.sql.Connection conn = connectToDatabase();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, sifra);
+            stmt.setString(1, encrypted);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -49,13 +54,14 @@ public class Connection {
 
     public static Object[] checkTajnistvoCredentials(String email, String password) {
         Object[] result = null;
+        String encrypted = encryptPassword(password);
         String query = "SELECT * FROM checkTajnistvoCredentials(?, ?)";
 
         try (java.sql.Connection conn = connectToDatabase();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, email);
-            stmt.setString(2, password);
+            stmt.setString(2, encrypted);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -64,7 +70,7 @@ public class Connection {
                     String glavniTajnikCa = rs.getString("gglavnia_tajnikca");
 
                     if (id != -1) {
-                        result = new Object[]{(Object) id, ime, glavniTajnikCa};
+                        result = new Object[]{id, ime, glavniTajnikCa};
                     }
                 }
             }
@@ -166,13 +172,15 @@ public class Connection {
     }
 
     public static void updateZdravnik(String csifra, String nsifra, String cnaziv, String nnaziv) {
+        String encryptedCurrent = encryptPassword(csifra);
+        String encryptedNew = encryptPassword(nsifra);
         String query = "SELECT updajtajZdravnika(?, ?, ?, ?)";
 
         try (java.sql.Connection conn = connectToDatabase();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, csifra);
-            stmt.setString(2, nsifra);
+            stmt.setString(1, encryptedCurrent);
+            stmt.setString(2, encryptedNew);
             stmt.setString(3, cnaziv);
             stmt.setString(4, nnaziv);
 
@@ -226,8 +234,9 @@ public class Connection {
 
         return tajnistvo;
     }
-    public static void updateTajnistvo(int tid, String ime, String email, String telefon, String glavniTajnik, String naslov, String posta) {
-        String query = "SELECT updajtajTajnistvo(?, ?, ?, ?, ?, ?, ?)";
+    public static void updateTajnistvo(int tid, String ime, String email, String telefon, String glavniTajnik, String naslov, String posta, String geslo) {
+        String encrypted = encryptPassword(geslo);
+        String query = "SELECT updajtajTajnistvo(?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (java.sql.Connection conn = connectToDatabase();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -239,6 +248,7 @@ public class Connection {
             stmt.setString(5, glavniTajnik);
             stmt.setString(6, naslov);
             stmt.setString(7, posta);
+            stmt.setString(8, encrypted);
 
             stmt.execute();
             System.out.println("Tajnistvo updated successfully.");
@@ -246,7 +256,6 @@ public class Connection {
         } catch (SQLException e) {
             System.out.println("Error updating tajnistvo: " + e.getMessage());
         }
-
     }
 
     public static List<Object[]> getAllKraji() {
@@ -632,13 +641,15 @@ public class Connection {
 
     public static String insertajZdravnika(String patronsifra, String ssifra, String nnaziv) {
         String result = null;
+        String encryptedPatron = encryptPassword(patronsifra);
+        String encryptedSelf = encryptPassword(ssifra);
         String query = "SELECT insertajZdravnika(?, ?, ?)";
 
         try (java.sql.Connection conn = connectToDatabase();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, patronsifra);
-            stmt.setString(2, ssifra);
+            stmt.setString(1, encryptedPatron);
+            stmt.setString(2, encryptedSelf);
             stmt.setString(3, nnaziv);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -656,6 +667,7 @@ public class Connection {
 
     public static boolean insertajTajnistvo(String ime, String email, String telefon,
                                             String glavniTajnikCa, String naslov, String posta, String pass) {
+        String encrypted = encryptPassword(pass);
         String query = "SELECT insertajTajnistvo(?, ?, ?, ?, ?, ?, ?)";
 
         try (java.sql.Connection conn = connectToDatabase();
@@ -667,9 +679,9 @@ public class Connection {
             stmt.setString(4, glavniTajnikCa);
             stmt.setString(5, naslov);
             stmt.setString(6, posta);
-            stmt.setString(7, pass);
+            stmt.setString(7, encrypted);
 
-            stmt.execute(); // No result expected, just execute
+            stmt.execute();
             return true;
         } catch (SQLException e) {
             System.out.println("Error inserting tajnistvo: " + e.getMessage());
@@ -745,5 +757,23 @@ public class Connection {
         }
     }
 
+    private static final String SECRET_KEY = EnvLoader.getEnv("SECRET_KEY"); // Loaded from .env
+    private static final int ITERATIONS = 100000;
+    private static final int KEY_LENGTH = 256;
 
+    public static String encryptPassword(String password) {
+        try {
+            if (SECRET_KEY == null || SECRET_KEY.isEmpty()) {
+                throw new IllegalStateException("SECRET_KEY not set in .env file.");
+            }
+
+            byte[] saltBytes = SECRET_KEY.getBytes();
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, ITERATIONS, KEY_LENGTH);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            byte[] hash = factory.generateSecret(spec).getEncoded();
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (Exception e) {
+            throw new RuntimeException("Error encrypting password", e);
+        }
+    }
 }

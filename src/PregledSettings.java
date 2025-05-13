@@ -15,7 +15,6 @@ public class PregledSettings extends JFrame {
     private JTextArea opombeArea;
     private JTextField emsoField;
 
-    // Date & Time components
     private JComboBox<Integer> dayBox;
     private JComboBox<Integer> monthBox;
     private JComboBox<Integer> yearBox;
@@ -24,7 +23,7 @@ public class PregledSettings extends JFrame {
     private String id;
 
     public PregledSettings(String id, String datum, String opombe, String emso) {
-        this.id = id;  // Store the ID for later use
+        this.id = id;
 
         setTitle("Uredi Pregled");
         setSize(600, 400);
@@ -58,18 +57,17 @@ public class PregledSettings extends JFrame {
         timeSpinner.setValue(new Date());
         dateTimePanel.add(timeSpinner);
 
-        // Parse the incoming date string into fields (assumes format "yyyy-MM-dd HH:mm:ss")
+        // Parse existing datum
         try {
-            String formattedDatum = datum.split("\\.")[0]; // Remove everything after the decimal point
-            LocalDateTime ldt = LocalDateTime.parse(formattedDatum.replace(" ", "T")); // Simple conversion
+            String formattedDatum = datum.split("\\.")[0]; // Remove trailing ".0" if present
+            LocalDateTime ldt = LocalDateTime.parse(formattedDatum.replace(" ", "T"));
             dayBox.setSelectedItem(ldt.getDayOfMonth());
             monthBox.setSelectedItem(ldt.getMonthValue());
             yearBox.setSelectedItem(ldt.getYear());
             timeSpinner.setValue(java.sql.Time.valueOf(ldt.toLocalTime()));
 
-            // Check if the datum is in the future
             if (ldt.isBefore(LocalDateTime.now())) {
-                disableDateTimeEditing(); // Disable date and time editing if it's in the past
+                disableDateTimeEditing();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,7 +91,7 @@ public class PregledSettings extends JFrame {
         JButton cancel = new JButton("Prekliči");
         JButton delete = new JButton("Izbriši");
 
-        // Update button action
+        // === UPDATE BUTTON LOGIC ===
         update.addActionListener((ActionEvent e) -> {
             try {
                 int day = (int) dayBox.getSelectedItem();
@@ -108,29 +106,36 @@ public class PregledSettings extends JFrame {
                 LocalTime localTime = LocalTime.of(hour, minute);
 
                 LocalDateTime dateTime = LocalDateTime.of(LocalDate.of(year, month, day), localTime);
-                Timestamp timestamp = Timestamp.valueOf(dateTime.withNano(0)); // no .0 bullshit
 
+                // Check if the datetime is in the future
+                if (!dateTime.isAfter(LocalDateTime.now())) {
+                    JOptionPane.showMessageDialog(PregledSettings.this,
+                            "Datum in čas morata biti v prihodnosti.",
+                            "Neveljaven datum", JOptionPane.WARNING_MESSAGE);
+                    return; // Let the user change it again
+                }
+
+                Timestamp timestamp = Timestamp.valueOf(dateTime.withNano(0)); // trim nano
                 String newOpombe = opombeArea.getText();
                 String newEmso = emsoField.getText();
 
-                // Fire the SQL function to update
                 Connection.updajtajPregled(id, id, timestamp, newOpombe, newEmso);
-
                 JOptionPane.showMessageDialog(PregledSettings.this, "Pregled uspešno posodobljen.");
                 dispose();
             } catch (Exception ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(PregledSettings.this, "Napaka pri posodabljanju!", "Napaka", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(PregledSettings.this,
+                        "Napaka pri posodabljanju!",
+                        "Napaka", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Cancel button action
         cancel.addActionListener(e -> dispose());
 
-        // Delete button action
         delete.addActionListener(e -> {
             int confirmed = JOptionPane.showConfirmDialog(PregledSettings.this,
-                    "Ali ste prepričani, da želite izbrisati ta pregled?", "Potrdite brisanje",
+                    "Ali ste prepričani, da želite izbrisati ta pregled?",
+                    "Potrdite brisanje",
                     JOptionPane.YES_NO_OPTION);
 
             if (confirmed == JOptionPane.YES_OPTION) {
@@ -144,7 +149,7 @@ public class PregledSettings extends JFrame {
         buttons.add(cancel);
         buttons.add(delete);
 
-        // === ADD ALL TO FRAME ===
+        // === LAYOUT ===
         JPanel center = new JPanel(new BorderLayout());
         center.add(dateTimePanel, BorderLayout.NORTH);
         center.add(form, BorderLayout.CENTER);
@@ -153,7 +158,6 @@ public class PregledSettings extends JFrame {
         add(buttons, BorderLayout.SOUTH);
     }
 
-    // Method to disable date and time editing if the date is in the past
     private void disableDateTimeEditing() {
         dayBox.setEnabled(false);
         monthBox.setEnabled(false);

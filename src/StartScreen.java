@@ -52,7 +52,7 @@ public class StartScreen {
         sifraLoginButton.addActionListener(e -> {
             String sifra = sifraField.getText().trim();
             if (sifra.isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Please enter your šifra.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Prosim vnesite šifro.", "Input Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 

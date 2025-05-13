@@ -66,6 +66,13 @@ public class OddelekNaroci extends JFrame {
                 Timestamp timestamp = Timestamp.valueOf(dateTime.withNano(0));
                 String opombe = opombeArea.getText().trim();
 
+                // Check if the selected date is in the past
+                if (timestamp.before(Timestamp.valueOf(LocalDateTime.now().withNano(0)))) {
+                    JOptionPane.showMessageDialog(this, "Izbrani datum je starejši od današnjega. Prosimo, izberite novega.",
+                            "Napaka", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
                 boolean success = Connection.pokreniPregledeZaOddelek(oddelekId, String.valueOf(year), timestamp, opombe);
                 if (success) {
                     JOptionPane.showMessageDialog(this, "Pregled uspešno naročen!");

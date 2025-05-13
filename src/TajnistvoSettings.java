@@ -22,7 +22,7 @@ public class TajnistvoSettings extends JFrame {
         JTextField telefonField = new JTextField();
         JTextField tajnikCaField = new JTextField();
         JTextField naslovField = new JTextField();
-        JPasswordField passwordField = new JPasswordField();
+        JTextField passwordField = new JPasswordField();
         JComboBox<String> krajDropdown = new JComboBox<>();
         List<Object[]> kraji = Connection.getAllKraji();
 
@@ -75,6 +75,7 @@ public class TajnistvoSettings extends JFrame {
                 String glavniTajnik = tajnikCaField.getText();
                 String naslov = naslovField.getText();
                 String selectedKraj = (String) krajDropdown.getSelectedItem();
+                String geslo =  passwordField.getText();
 
                 if (ime == null || ime.trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Ime ne sme biti prazno!");
@@ -83,7 +84,7 @@ public class TajnistvoSettings extends JFrame {
 
                 String posta = selectedKraj.split(" - ")[0];
 
-                Connection.updateTajnistvo(id, ime, email, telefon, glavniTajnik, naslov, posta);
+                Connection.updateTajnistvo(id, ime, email, telefon, glavniTajnik, naslov, posta, geslo);
 
                 // Tell listener to refresh
                 if (listener != null) {

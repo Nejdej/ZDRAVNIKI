@@ -86,6 +86,15 @@ public class NarociPregledWindow extends JFrame {
                 );
 
                 Timestamp datum = Timestamp.valueOf(localDateTime);
+
+                // Check if the selected date is older than today
+                LocalDateTime currentDateTime = LocalDateTime.now();
+                if (localDateTime.isBefore(currentDateTime)) {
+                    JOptionPane.showMessageDialog(this, "Izbrani datum je starejši od današnjega. Prosim, izberite prihodnji datum.",
+                            "Napaka", JOptionPane.WARNING_MESSAGE);
+                    return; // Do not proceed with the insertion
+                }
+
                 Connection.insertajPregled(String.valueOf(year), datum, opombe, emso);
 
                 JOptionPane.showMessageDialog(this, "Pregled uspešno dodan!", "Uspeh", JOptionPane.INFORMATION_MESSAGE);
