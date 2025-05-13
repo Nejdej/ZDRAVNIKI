@@ -801,4 +801,24 @@ public class Connection {
         }
         return logEntries;
     }
+
+    public static String resetPasswordForTajnistvo(String email, String newPassword) {
+        String encryptedPassword = encryptPassword(newPassword);
+        String query = "SELECT resetPassword(?, ?)";  // Assuming the resetPassword function expects encrypted passwords
+
+        try (java.sql.Connection conn = connectToDatabase();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, email);
+            stmt.setString(2, encryptedPassword);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString(1); // Return the result from the resetPassword function
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Error resetting password.";
+    }
 }
